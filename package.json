@@ -1,0 +1,23 @@
+{
+  "name": "shein-scraping-sidecar",
+  "version": "1.0.0",
+  "description": "Adjacent SHEIN product API using network JSON first and HTML only as last fallback",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "check": "node --check src/server.js && node --check src/config.js && node --check src/routes/index.js && node --check src/controllers/product.js && node --check src/services/browser.js && node --check src/services/shein.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "playwright": "^1.53.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
