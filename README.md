@@ -36,6 +36,8 @@ npm start
 - `RETRY_ATTEMPTS`: numero total de tentativas por pedido
 - cada round tenta `direct` e todos os proxies uma vez, em ordem round-robin
 - `PREWARM_HOME_MS`: tempo de espera depois de abrir a homepage
+- `VERIFICATION_WAIT_MS`: quanto tempo esperar por verificacao humana manual do Temu quando aparece o puzzle
+- `LOGIN_WAIT_MS`: quanto tempo esperar por login manual quando o Temu redireciona para autenticacao
 - `SESSION_STATE_DIR`: pasta onde os cookies/sessoes ficam persistidos
 - `PROXY_URLS`: lista separada por virgula com proxies no formato `http://user:pass@host:port`
 
