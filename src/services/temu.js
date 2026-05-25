@@ -205,7 +205,7 @@ const buildAttempts = () => {
 };
 
 const createResponseBucket = () => ({
-  goodsDetail: null,
+  goodsDetail: [],
 });
 
 const resolveResponseType = (url) => {
@@ -218,6 +218,26 @@ const resolveResponseType = (url) => {
   return null;
 };
 
+const parseCapturedResponse = async (response) => {
+  const contentType = response.headers()["content-type"] || "";
+
+  if (contentType.includes("application/json")) {
+    return response.json();
+  }
+
+  const body = await response.text();
+
+  if (!body) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(body);
+  } catch {
+    return null;
+  }
+};
+
 const attachResponseCollector = (page, bucket) => {
   const handler = async (response) => {
     const responseType = resolveResponseType(response.url());
@@ -226,16 +246,19 @@ const attachResponseCollector = (page, bucket) => {
       return;
     }
 
-    const contentType = response.headers()["content-type"] || "";
-
-    if (!contentType.includes("application/json")) {
-      return;
-    }
-
     try {
-      bucket[responseType] = await response.json();
+      const payload = await parseCapturedResponse(response);
+
+      if (!payload) {
+        return;
+      }
+
+      bucket[responseType].push({
+        url: response.url(),
+        payload,
+      });
     } catch {
-      bucket[responseType] = null;
+      // ignore unrelated or malformed matching responses
     }
   };
 
@@ -296,8 +319,112 @@ const findProductJsonLd = (blocks) => {
   return null;
 };
 
+const getNestedValue = (input, path) => {
+  let current = input;
+
+  for (const segment of path) {
+    if (!current || typeof current !== "object") {
+      return null;
+    }
+
+    current = current[segment];
+  }
+
+  return current ?? null;
+};
+
+const findCandidateResultObjects = (payload) => {
+  const directCandidates = [
+    getNestedValue(payload, ["result"]),
+    getNestedValue(payload, ["data", "result"]),
+    getNestedValue(payload, ["data"]),
+    getNestedValue(payload, ["goods"]),
+    getNestedValue(payload, ["result", "goods"]),
+  ].filter((value) => value && typeof value === "object");
+
+  const queue = [...directCandidates, payload];
+  const seen = new Set();
+  const matches = [];
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+
+    if (!current || typeof current !== "object" || seen.has(current)) {
+      continue;
+    }
+
+    seen.add(current);
+
+    const hasProductShape =
+      "price_info" in current ||
+      "property_list" in current ||
+      "sku_list" in current ||
+      "goods_imgs" in current ||
+      "display_name" in current ||
+      "goods_name" in current;
+
+    if (hasProductShape) {
+      matches.push(current);
+    }
+
+    for (const value of Object.values(current)) {
+      if (value && typeof value === "object") {
+        queue.push(value);
+      }
+    }
+  }
+
+  return uniqueBy(matches, (value) => JSON.stringify(value));
+};
+
+const normalizeCandidateGoodsId = (result) =>
+  firstNonEmpty(
+    String(result?.goods_id || ""),
+    String(result?.goodsId || ""),
+    String(result?.goods_id_str || "")
+  );
+
+const scoreCandidateResult = (result, productContext) => {
+  const candidateGoodsId = normalizeCandidateGoodsId(result);
+  let score = candidateGoodsId === productContext.goodsId ? 100 : 0;
+
+  if (firstNonEmpty(result?.display_name, result?.goods_name)) {
+    score += 10;
+  }
+
+  if (Array.isArray(result?.goods_imgs) && result.goods_imgs.length > 0) {
+    score += 10;
+  }
+
+  if (Array.isArray(result?.property_list) && result.property_list.length > 0) {
+    score += 10;
+  }
+
+  if (Array.isArray(result?.sku_list) && result.sku_list.length > 0) {
+    score += 10;
+  }
+
+  if (result?.price_info && typeof result.price_info === "object") {
+    score += 10;
+  }
+
+  return score;
+};
+
+const resolveGoodsDetailResult = (bucket, productContext) => {
+  const candidates = bucket.goodsDetail.flatMap((entry) => findCandidateResultObjects(entry.payload));
+
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  return candidates.sort(
+    (left, right) => scoreCandidateResult(right, productContext) - scoreCandidateResult(left, productContext)
+  )[0];
+};
+
 const extractApiData = (bucket, productContext) => {
-  const result = bucket.goodsDetail?.result;
+  const result = resolveGoodsDetailResult(bucket, productContext);
 
   if (!result) {
     return null;
@@ -779,13 +906,27 @@ const navigateToProduct = async (page, productUrl) => {
 };
 
 const waitForLoginAndReturn = async (page, productUrl) => {
+  if (config.browserHeadless) {
+    throw new UpstreamBlockError(
+      "Temu requires login. Set BROWSER_HEADLESS=false, complete the login in the opened browser, and retry.",
+      {
+        requiresLogin: true,
+        loginWaitMs: config.loginWaitMs,
+      }
+    );
+  }
+
   try {
     await page.waitForURL((url) => !isOnLoginPage(url.href), {
-      timeout: config.humanSolveWaitMs,
+      timeout: config.loginWaitMs,
     });
   } catch {
     throw new UpstreamBlockError(
-      "Temu redirected to login page. Please log in within the browser window and retry."
+      "Temu redirected to login page. Please log in within the browser window and wait for the product page to resume.",
+      {
+        requiresLogin: true,
+        loginWaitMs: config.loginWaitMs,
+      }
     );
   }
 
@@ -832,6 +973,36 @@ const tryDismissLoginWall = async (page) => {
     } catch {
       continue;
     }
+  }
+};
+
+const waitForHumanVerification = async (page) => {
+  if (config.browserHeadless) {
+    throw new UpstreamBlockError(
+      "Temu requested human verification. Set BROWSER_HEADLESS=false, solve the puzzle in the opened browser, and retry.",
+      {
+        requiresHumanVerification: true,
+        verificationWaitMs: config.verificationWaitMs,
+      }
+    );
+  }
+
+  try {
+    await page.waitForFunction(
+      () => {
+        const text = (document.body?.innerText || "") + (document.title || "");
+        return !/slide to verify|verify.*human|security.*check|verificação de segurança|vérification de sécurité|verificación de seguridad/i.test(text);
+      },
+      { timeout: config.verificationWaitMs }
+    );
+  } catch {
+    throw new UpstreamBlockError(
+      "Temu requested human verification (sliding puzzle). Solve it in the browser window and wait for the product page to resume.",
+      {
+        requiresHumanVerification: true,
+        verificationWaitMs: config.verificationWaitMs,
+      }
+    );
   }
 };
 
@@ -899,16 +1070,16 @@ export const fetchProductDetails = async (productUrl) => {
             } else if (isLoginWall(snapshot.html, snapshot.pageTitle)) {
               await tryDismissLoginWall(page);
               snapshot = await readPageSnapshot(page);
+
+              if (isOnLoginPage(page.url()) || isLoginWall(snapshot.html, snapshot.pageTitle)) {
+                await waitForLoginAndReturn(page, productContext.productUrl);
+                await page.waitForTimeout(config.pageWaitMs);
+                snapshot = await readPageSnapshot(page);
+              }
             }
 
             if (isHumanCheck(snapshot.html, snapshot.pageTitle)) {
-              await page.waitForFunction(
-                () => {
-                  const text = (document.body?.innerText || "") + (document.title || "");
-                  return !/slide to verify|verify.*human|security.*check|verificação de segurança|vérification de sécurité|verificación de seguridad/i.test(text);
-                },
-                { timeout: config.humanSolveWaitMs }
-              );
+              await waitForHumanVerification(page);
               snapshot = await readPageSnapshot(page);
             }
 
