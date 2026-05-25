@@ -1,0 +1,14 @@
+services:
+  sidecar:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      PORT: 3002
+      BROWSER_HEADLESS: "true"
+      NAVIGATION_TIMEOUT_MS: 45000
+      PAGE_WAIT_MS: 4000
+      RETRY_ATTEMPTS: 3
+    volumes:
+      - ./sessions:/app/.sessions
