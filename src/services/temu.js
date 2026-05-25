@@ -1,0 +1,998 @@
+import fs from "fs/promises";
+import path from "path";
+import { config, resolveProjectPath } from "../config.js";
+import { withPage } from "./browser.js";
+import {
+  getAttemptPlan,
+  getProxyMetrics,
+  recordCandidateFailure,
+  recordCandidateSuccess,
+} from "./proxy-pool.js";
+
+const RESPONSE_TYPES = {
+  goodsDetail: /\/api\/poppy\/v1\/goods\b/i,
+};
+
+const HUMAN_CHECK_PATTERNS = [
+  /slide to verify/i,
+  /verify.*human/i,
+  /security.*check/i,
+  /verificação de segurança/i,
+  /vérification de sécurité/i,
+  /verificación de seguridad/i,
+];
+
+const LOGIN_WALL_PATTERNS = [
+  /enter your (email|phone)/i,
+  /sign in to temu/i,
+  /log in.*temu/i,
+  /introduz.*email|introduz.*telefone/i,
+  /continuar com.*email|continuar com.*telefone/i,
+  /continue with.*email|continue with.*phone/i,
+];
+
+const GENERIC_PAGE_TITLES = [
+  /^temu\b/i,
+  /temu[-–—]\s*as low as/i,
+  /shop.*temu/i,
+];
+
+export class UpstreamBlockError extends Error {
+  constructor(message, details = {}) {
+    super(message);
+    this.name = "UpstreamBlockError";
+    this.details = details;
+  }
+}
+
+const createAttemptMetadata = (attempt) => ({
+  attempt: attempt.attemptNumber,
+  round: attempt.round,
+  proxy: attempt.label,
+  proxyTarget: attempt.proxyDisplay || null,
+  sessionProfile: attempt.profileKey,
+});
+
+const firstNonEmpty = (...values) => {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+
+    if (value !== null && value !== undefined && value !== "") {
+      return value;
+    }
+  }
+
+  return null;
+};
+
+const unique = (values) => [...new Set(values.filter(Boolean))];
+
+const uniqueBy = (values, getKey) => {
+  const seen = new Set();
+
+  return values.filter((value) => {
+    const key = getKey(value);
+
+    if (!key || seen.has(key)) {
+      return false;
+    }
+
+    seen.add(key);
+    return true;
+  });
+};
+
+const normalizeImageUrl = (value) => {
+  if (!value || typeof value !== "string") {
+    return null;
+  }
+
+  if (value.startsWith("//")) {
+    return `https:${value}`;
+  }
+
+  if (value.startsWith("http://")) {
+    return `https://${value.slice("http://".length)}`;
+  }
+
+  return value;
+};
+
+const normalizeVariant = (variant) => {
+  if (!variant || typeof variant !== "object") {
+    return null;
+  }
+
+  return {
+    sku: firstNonEmpty(variant.sku),
+    size: firstNonEmpty(variant.size),
+    color: firstNonEmpty(variant.color),
+    price: firstNonEmpty(variant.price),
+    availability: firstNonEmpty(variant.availability),
+    url: firstNonEmpty(variant.url),
+  };
+};
+
+const PRODUCT_CACHE_FILE = "temu-product-cache.json";
+
+const getProductCachePath = () => {
+  const directoryPath = resolveProjectPath(config.sessionStateDir);
+  return path.join(directoryPath, PRODUCT_CACHE_FILE);
+};
+
+const readProductCache = async () => {
+  try {
+    const raw = await fs.readFile(getProductCachePath(), "utf8");
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+};
+
+const writeProductCacheEntry = async (productData) => {
+  if (!productData?.goodsId) {
+    return;
+  }
+
+  const cachePath = getProductCachePath();
+  await fs.mkdir(path.dirname(cachePath), { recursive: true });
+
+  const cache = await readProductCache();
+  cache[productData.goodsId] = {
+    ...productData,
+    cachedAt: new Date().toISOString(),
+  };
+
+  await fs.writeFile(cachePath, JSON.stringify(cache, null, 2));
+};
+
+const buildCachedResponse = (cachedData, productContext, attempts, failureHistory) => ({
+  ...cachedData,
+  url: productContext.productUrl,
+  sourceChain: unique([...(cachedData.sourceChain || []), "local-cache"]),
+  antiBot: {
+    attempt: null,
+    round: null,
+    proxy: null,
+    proxyTarget: null,
+    sessionProfile: null,
+    totalAttempts: attempts.length,
+    attemptsTried: attempts.length,
+    attemptHistory: failureHistory,
+    proxyMetrics: getProxyMetrics(),
+    cacheHit: true,
+  },
+});
+
+const parseProductUrl = (productUrl) => {
+  let parsedUrl;
+
+  try {
+    parsedUrl = new URL(productUrl);
+  } catch {
+    const error = new TypeError("The provided URL is invalid.");
+    error.name = "InvalidUrlError";
+    throw error;
+  }
+
+  const pathMatch = parsedUrl.pathname.match(/-[pg]-(\d+)/i);
+  const goodsId = pathMatch?.[1] || parsedUrl.searchParams.get("goods_id");
+
+  if (!goodsId) {
+    const error = new TypeError("Unable to extract goodsId from the provided URL.");
+    error.name = "InvalidUrlError";
+    throw error;
+  }
+
+  return {
+    goodsId,
+    productUrl: parsedUrl.toString(),
+  };
+};
+
+const buildAttempts = () => {
+  return getAttemptPlan(config.retryAttempts).map((candidate, index) => ({
+    ...candidate,
+    attemptNumber: index + 1,
+    profileKey:
+      candidate.label === "direct"
+        ? "temu-direct"
+        : `temu-${candidate.label}`,
+  }));
+};
+
+const createResponseBucket = () => ({
+  goodsDetail: null,
+});
+
+const resolveResponseType = (url) => {
+  for (const [name, pattern] of Object.entries(RESPONSE_TYPES)) {
+    if (pattern.test(url)) {
+      return name;
+    }
+  }
+
+  return null;
+};
+
+const attachResponseCollector = (page, bucket) => {
+  const handler = async (response) => {
+    const responseType = resolveResponseType(response.url());
+
+    if (!responseType) {
+      return;
+    }
+
+    const contentType = response.headers()["content-type"] || "";
+
+    if (!contentType.includes("application/json")) {
+      return;
+    }
+
+    try {
+      bucket[responseType] = await response.json();
+    } catch {
+      bucket[responseType] = null;
+    }
+  };
+
+  page.on("response", handler);
+
+  return () => {
+    page.off("response", handler);
+  };
+};
+
+const parseJsonLdBlocks = (html) => {
+  const blocks = [];
+  const pattern = /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+
+  for (const match of html.matchAll(pattern)) {
+    const source = match[1]?.trim();
+
+    if (!source) {
+      continue;
+    }
+
+    try {
+      blocks.push(JSON.parse(source));
+    } catch {
+      continue;
+    }
+  }
+
+  return blocks;
+};
+
+const findProductJsonLd = (blocks) => {
+  const queue = [...blocks];
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+
+    if (!current) {
+      continue;
+    }
+
+    if (Array.isArray(current)) {
+      queue.push(...current);
+      continue;
+    }
+
+    if (current["@type"] === "ProductGroup" || current["@type"] === "Product") {
+      return current;
+    }
+
+    for (const value of Object.values(current)) {
+      if (value && typeof value === "object") {
+        queue.push(value);
+      }
+    }
+  }
+
+  return null;
+};
+
+const extractApiData = (bucket, productContext) => {
+  const result = bucket.goodsDetail?.result;
+
+  if (!result) {
+    return null;
+  }
+
+  const priceInfo = result.price_info || {};
+  const rawPrice = priceInfo.price;
+  const rawMarketPrice = priceInfo.market_price;
+
+  const propertyList = Array.isArray(result.property_list) ? result.property_list : [];
+
+  const colors = unique(
+    propertyList
+      .filter((prop) => /color|colour|cor/i.test(prop?.property_name || ""))
+      .flatMap((prop) =>
+        (prop.sku_property_values || []).map((v) => firstNonEmpty(v?.property_value_name))
+      )
+  );
+
+  const sizes = unique(
+    propertyList
+      .filter((prop) => /size|tamanho|taille|talla/i.test(prop?.property_name || ""))
+      .flatMap((prop) =>
+        (prop.sku_property_values || []).map((v) => firstNonEmpty(v?.property_value_name))
+      )
+  );
+
+  const skuList = Array.isArray(result.sku_list) ? result.sku_list : [];
+  const variants = uniqueBy(
+    skuList
+      .map((sku) => {
+        if (!sku) {
+          return null;
+        }
+
+        const propMap = sku.sale_prop_map || {};
+        const propValues = Object.values(propMap).filter(Boolean);
+
+        return normalizeVariant({
+          sku: firstNonEmpty(String(sku.sku_id || "")),
+          size: propValues.find((v) => sizes.includes(v)) || null,
+          color: propValues.find((v) => colors.includes(v)) || null,
+          price:
+            typeof sku.price === "number"
+              ? String(sku.price / 100)
+              : firstNonEmpty(String(sku.price || "")),
+          availability: null,
+          url: null,
+        });
+      })
+      .filter(Boolean),
+    (variant) => variant.sku || `${variant.size}-${variant.color}`
+  );
+
+  const goodsImgs = Array.isArray(result.goods_imgs) ? result.goods_imgs : [];
+  const images = unique(
+    goodsImgs
+      .map((img) => {
+        if (!img || typeof img !== "object") {
+          return null;
+        }
+
+        return normalizeImageUrl(img.origin_url || img.url || img.thumb_url);
+      })
+      .filter(Boolean)
+  );
+
+  return {
+    goodsId: productContext.goodsId,
+    title: firstNonEmpty(result.display_name, result.goods_name),
+    color: colors[0] || null,
+    colors,
+    sizes,
+    variants,
+    brand: firstNonEmpty(result.brand?.name, result.brand_name),
+    price: {
+      amount: typeof rawPrice === "number" ? String(rawPrice / 100) : null,
+      formatted: firstNonEmpty(priceInfo.price_with_symbol),
+      retailAmount: typeof rawMarketPrice === "number" ? String(rawMarketPrice / 100) : null,
+      retailFormatted: firstNonEmpty(priceInfo.market_price_with_symbol),
+      discountPercent: firstNonEmpty(priceInfo.discount_rate),
+    },
+    images,
+    sourceStage: "network-json",
+  };
+};
+
+const extractStructuredFallback = (html) => {
+  const jsonLdBlocks = parseJsonLdBlocks(html);
+  const product = findProductJsonLd(jsonLdBlocks);
+
+  if (!product) {
+    return null;
+  }
+
+  const firstVariant = Array.isArray(product.hasVariant) ? product.hasVariant[0] : null;
+  const variantOffer = firstVariant?.offers;
+  const variants = Array.isArray(product.hasVariant)
+    ? uniqueBy(
+        product.hasVariant
+          .map((variant) =>
+            normalizeVariant({
+              sku: variant.sku,
+              size: variant.size,
+              color: variant.color || product.color,
+              price: variant.offers?.price,
+              availability: variant.offers?.availability,
+              url: variant.offers?.url,
+            })
+          )
+          .filter(Boolean),
+        (variant) => variant.sku || `${variant.size}-${variant.color}`
+      )
+    : [];
+
+  return {
+    title: firstNonEmpty(product.name, firstVariant?.name),
+    color: firstNonEmpty(product.color),
+    colors: unique([product.color, ...variants.map((variant) => variant.color)]),
+    sizes: unique(variants.map((variant) => variant.size)),
+    variants,
+    images: unique((product.image || []).map(normalizeImageUrl)),
+    price: {
+      amount: firstNonEmpty(variantOffer?.price, product.offers?.price),
+      formatted: null,
+      retailAmount: null,
+      retailFormatted: null,
+      discountPercent: null,
+    },
+    brand: firstNonEmpty(product.brand?.name),
+    sourceStage: "json-ld",
+  };
+};
+
+const extractDomFallback = async (page) => {
+  try {
+    const domData = await page.evaluate(() => {
+      const compact = (value) =>
+        typeof value === "string" ? value.replace(/\s+/g, " ").trim() : "";
+      const unique = (values) => [...new Set(values.filter(Boolean))];
+      const normalizeUrl = (value) => {
+        if (!value || typeof value !== "string") {
+          return null;
+        }
+
+        if (value.startsWith("//")) {
+          return `https:${value}`;
+        }
+
+        if (value.startsWith("http://")) {
+          return `https://${value.slice("http://".length)}`;
+        }
+
+        return value;
+      };
+
+      const parseJsonLdBlocks = () =>
+        Array.from(document.querySelectorAll("script[type='application/ld+json']"))
+          .map((node) => node.textContent?.trim())
+          .filter(Boolean)
+          .flatMap((source) => {
+            try {
+              return [JSON.parse(source)];
+            } catch {
+              return [];
+            }
+          });
+
+      const findProductJsonLd = (blocks) => {
+        const queue = [...blocks];
+
+        while (queue.length > 0) {
+          const current = queue.shift();
+
+          if (!current) {
+            continue;
+          }
+
+          if (Array.isArray(current)) {
+            queue.push(...current);
+            continue;
+          }
+
+          if (current["@type"] === "ProductGroup" || current["@type"] === "Product") {
+            return current;
+          }
+
+          for (const value of Object.values(current)) {
+            if (value && typeof value === "object") {
+              queue.push(value);
+            }
+          }
+        }
+
+        return null;
+      };
+
+      const product = findProductJsonLd(parseJsonLdBlocks());
+
+      const titleEl =
+        document.querySelector("h1") ||
+        document.querySelector('[class*="title"]');
+      const title = compact(titleEl?.textContent);
+
+      const priceEls = Array.from(document.querySelectorAll('[class*="price"]'));
+      const price = compact(priceEls[0]?.textContent);
+
+      const colorEls = Array.from(
+        document.querySelectorAll('[class*="color"] [class*="item"], [class*="color-item"]')
+      );
+      const colors = unique(
+        colorEls.map((el) =>
+          compact(el.getAttribute("aria-label") || el.getAttribute("title") || el.textContent)
+        )
+      );
+
+      const sizeEls = Array.from(
+        document.querySelectorAll('[class*="size"] button, [class*="size-item"]')
+      );
+      const sizes = unique(sizeEls.map((el) => compact(el.textContent)));
+
+      const imgEls = Array.from(
+        document.querySelectorAll('[class*="gallery"] img, [class*="swiper"] img')
+      );
+      const images = unique(
+        imgEls.map((el) => normalizeUrl(el.getAttribute("src"))).filter(Boolean)
+      );
+
+      const jsonLdVariants = Array.isArray(product?.hasVariant)
+        ? product.hasVariant
+            .map((variant) => ({
+              sku: compact(variant?.sku),
+              size: compact(variant?.size),
+              color: compact(variant?.color || product?.color),
+              price: compact(String(variant?.offers?.price || "")),
+              availability: compact(variant?.offers?.availability),
+              url: compact(variant?.offers?.url),
+            }))
+            .filter((variant) =>
+              variant.sku || variant.size || variant.color || variant.price || variant.url
+            )
+        : [];
+
+      const allColors = unique([...colors, compact(product?.color)]);
+      const allSizes = unique([...sizes, ...jsonLdVariants.map((v) => compact(v.size))]);
+      const allImages = unique([
+        ...images,
+        ...(Array.isArray(product?.image) ? product.image.map(normalizeUrl) : []),
+      ]);
+
+      if (
+        !title &&
+        allColors.length === 0 &&
+        allSizes.length === 0 &&
+        allImages.length === 0 &&
+        jsonLdVariants.length === 0
+      ) {
+        return null;
+      }
+
+      return {
+        title: title || null,
+        color: allColors[0] || null,
+        colors: allColors,
+        sizes: allSizes,
+        variants: jsonLdVariants,
+        images: allImages,
+        price: price
+          ? { amount: null, formatted: price, retailAmount: null, retailFormatted: null, discountPercent: null }
+          : null,
+      };
+    });
+
+    if (!domData) {
+      return null;
+    }
+
+    return {
+      ...domData,
+      sourceStage: "dom-live",
+    };
+  } catch {
+    return null;
+  }
+};
+
+const mergeProductData = (productContext, layers) => {
+  const sourceChain = [];
+  const merged = {
+    goodsId: productContext.goodsId,
+    title: null,
+    color: null,
+    colors: [],
+    sizes: [],
+    variants: [],
+    brand: null,
+    price: {
+      amount: null,
+      formatted: null,
+      retailAmount: null,
+      retailFormatted: null,
+      discountPercent: null,
+    },
+    images: [],
+    url: productContext.productUrl,
+    sourceChain,
+    fieldSources: {},
+  };
+
+  for (const layer of layers) {
+    if (!layer) {
+      continue;
+    }
+
+    const previousTitle = merged.title;
+    merged.title =
+      merged.title && !isGenericTitle(merged.title)
+        ? merged.title
+        : firstNonEmpty(layer.title, merged.title);
+    if (
+      (!previousTitle || isGenericTitle(previousTitle)) &&
+      merged.title &&
+      layer.sourceStage &&
+      !merged.fieldSources.title
+    ) {
+      merged.fieldSources.title = layer.sourceStage;
+    }
+
+    const previousColor = merged.color;
+    const shouldPreferDomColor = layer.sourceStage === "dom-live" && layer.color;
+    merged.color = shouldPreferDomColor
+      ? layer.color
+      : firstNonEmpty(merged.color, layer.color);
+    if (
+      ((shouldPreferDomColor && merged.color) || (!previousColor && merged.color)) &&
+      layer.sourceStage
+    ) {
+      merged.fieldSources.color = layer.sourceStage;
+    }
+
+    const previousColorsLength = merged.colors.length;
+    merged.colors =
+      layer.sourceStage === "dom-live" && (layer.colors || []).length > 0
+        ? unique([...(layer.colors || []), ...merged.colors, layer.color])
+        : unique([...merged.colors, ...(layer.colors || []), layer.color]);
+    if (
+      layer.sourceStage &&
+      ((layer.sourceStage === "dom-live" && (layer.colors || []).length > 0) ||
+        (merged.colors.length > previousColorsLength && !merged.fieldSources.colors))
+    ) {
+      merged.fieldSources.colors = layer.sourceStage;
+    }
+
+    const previousSizesLength = merged.sizes.length;
+    merged.sizes = unique([...merged.sizes, ...(layer.sizes || [])]);
+    if (
+      merged.sizes.length > previousSizesLength &&
+      layer.sourceStage &&
+      !merged.fieldSources.sizes
+    ) {
+      merged.fieldSources.sizes = layer.sourceStage;
+    }
+
+    const previousVariantsLength = merged.variants.length;
+    merged.variants = uniqueBy(
+      [...merged.variants, ...((layer.variants || []).map(normalizeVariant).filter(Boolean))],
+      (variant) => variant.sku || `${variant.size}-${variant.color}`
+    );
+    if (
+      merged.variants.length > previousVariantsLength &&
+      layer.sourceStage &&
+      !merged.fieldSources.variants
+    ) {
+      merged.fieldSources.variants = layer.sourceStage;
+    }
+
+    const previousBrand = merged.brand;
+    merged.brand = firstNonEmpty(merged.brand, layer.brand);
+    if (!previousBrand && merged.brand && layer.sourceStage && !merged.fieldSources.brand) {
+      merged.fieldSources.brand = layer.sourceStage;
+    }
+
+    const previousPriceAmount = merged.price.amount;
+    merged.price.amount = firstNonEmpty(merged.price.amount, layer.price?.amount);
+    merged.price.formatted = firstNonEmpty(merged.price.formatted, layer.price?.formatted);
+    merged.price.retailAmount = firstNonEmpty(
+      merged.price.retailAmount,
+      layer.price?.retailAmount
+    );
+    merged.price.retailFormatted = firstNonEmpty(
+      merged.price.retailFormatted,
+      layer.price?.retailFormatted
+    );
+    merged.price.discountPercent = firstNonEmpty(
+      merged.price.discountPercent,
+      layer.price?.discountPercent
+    );
+    if (
+      !previousPriceAmount &&
+      merged.price.amount &&
+      layer.sourceStage &&
+      !merged.fieldSources.price
+    ) {
+      merged.fieldSources.price = layer.sourceStage;
+    }
+
+    const previousImagesLength = merged.images.length;
+    merged.images = unique([...merged.images, ...(layer.images || [])]);
+    if (
+      merged.images.length > previousImagesLength &&
+      layer.sourceStage &&
+      !merged.fieldSources.images
+    ) {
+      merged.fieldSources.images = layer.sourceStage;
+    }
+
+    if (layer.sourceStage) {
+      sourceChain.push(layer.sourceStage);
+    }
+  }
+
+  return merged;
+};
+
+const prewarmSession = async (page) => {
+  if (config.prewarmHomeMs <= 0) {
+    return;
+  }
+
+  await page.goto("https://www.temu.com/", {
+    waitUntil: "domcontentloaded",
+    timeout: config.navigationTimeoutMs,
+  });
+  await page.waitForTimeout(config.prewarmHomeMs);
+};
+
+const readPageSnapshot = async (page) => {
+  let lastError;
+
+  for (let index = 0; index < 3; index += 1) {
+    try {
+      await page.waitForLoadState("domcontentloaded", {
+        timeout: config.requestTimeoutMs,
+      });
+
+      return {
+        pageTitle: await page.title(),
+        html: await page.content(),
+        bodyText: await page.evaluate(() => document.body.innerText),
+      };
+    } catch (error) {
+      lastError = error;
+      await page.waitForTimeout(500);
+    }
+  }
+
+  throw lastError;
+};
+
+const isOnLoginPage = (url) =>
+  typeof url === "string" && (url.includes("/login.html") || url.includes("/login?"));
+
+const navigateToProduct = async (page, productUrl) => {
+  try {
+    await page.goto(productUrl, {
+      waitUntil: "commit",
+      timeout: config.navigationTimeoutMs,
+    });
+  } catch (error) {
+    const msg = error.message || "";
+    if (!msg.includes("ERR_ABORTED") && !msg.includes("interrupted by another navigation")) {
+      throw error;
+    }
+  }
+
+  await page.waitForLoadState("domcontentloaded", {
+    timeout: config.requestTimeoutMs,
+  });
+};
+
+const waitForLoginAndReturn = async (page, productUrl) => {
+  try {
+    await page.waitForURL((url) => !isOnLoginPage(url.href), {
+      timeout: config.humanSolveWaitMs,
+    });
+  } catch {
+    throw new UpstreamBlockError(
+      "Temu redirected to login page. Please log in within the browser window and retry."
+    );
+  }
+
+  await navigateToProduct(page, productUrl);
+};
+
+const isHumanCheck = (html, pageTitle) => {
+  return HUMAN_CHECK_PATTERNS.some(
+    (pattern) => pattern.test(html) || pattern.test(pageTitle || "")
+  );
+};
+
+const isLoginWall = (html, pageTitle) => {
+  return LOGIN_WALL_PATTERNS.some(
+    (pattern) => pattern.test(html) || pattern.test(pageTitle || "")
+  );
+};
+
+const tryDismissLoginWall = async (page) => {
+  try {
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(800);
+  } catch {
+    // ignore
+  }
+
+  const closeSelectors = [
+    '[class*="close"]',
+    '[aria-label*="close" i]',
+    '[aria-label*="fechar" i]',
+    '[aria-label*="fermer" i]',
+    '[aria-label*="cerrar" i]',
+    'button[class*="modal"] svg',
+  ];
+
+  for (const selector of closeSelectors) {
+    try {
+      const locator = page.locator(selector).first();
+      if ((await locator.count()) > 0) {
+        await locator.click({ timeout: 2000 });
+        await page.waitForTimeout(800);
+        return;
+      }
+    } catch {
+      continue;
+    }
+  }
+};
+
+const isGenericTitle = (title) => {
+  if (!title || typeof title !== "string") {
+    return true;
+  }
+
+  return GENERIC_PAGE_TITLES.some((pattern) => pattern.test(title.trim()));
+};
+
+const hasUsefulProductData = (data) => {
+  return Boolean(
+    data.price.amount ||
+      data.images.length > 0 ||
+      (data.title && !isGenericTitle(data.title))
+  );
+};
+
+const classifyAttemptError = (error) => {
+  if (error instanceof UpstreamBlockError) {
+    return {
+      message: error.message,
+      code: error.name,
+      retryable: true,
+    };
+  }
+
+  const message =
+    typeof error?.message === "string" && error.message.trim()
+      ? error.message.trim()
+      : "Unknown candidate failure.";
+
+  return {
+    message,
+    code: error?.name || "Error",
+    retryable: true,
+  };
+};
+
+export const fetchProductDetails = async (productUrl) => {
+  const productContext = parseProductUrl(productUrl);
+  const attempts = buildAttempts();
+  const failureHistory = [];
+  const cachedProducts = await readProductCache();
+
+  for (const attempt of attempts) {
+    try {
+      const merged = await withPage(
+        async (page) => {
+          const bucket = createResponseBucket();
+          const detachCollector = attachResponseCollector(page, bucket);
+
+          try {
+            await prewarmSession(page);
+            await navigateToProduct(page, productContext.productUrl);
+            await page.waitForTimeout(config.pageWaitMs);
+
+            let snapshot = await readPageSnapshot(page);
+
+            if (isOnLoginPage(page.url())) {
+              await waitForLoginAndReturn(page, productContext.productUrl);
+              await page.waitForTimeout(config.pageWaitMs);
+              snapshot = await readPageSnapshot(page);
+            } else if (isLoginWall(snapshot.html, snapshot.pageTitle)) {
+              await tryDismissLoginWall(page);
+              snapshot = await readPageSnapshot(page);
+            }
+
+            if (isHumanCheck(snapshot.html, snapshot.pageTitle)) {
+              await page.waitForFunction(
+                () => {
+                  const text = (document.body?.innerText || "") + (document.title || "");
+                  return !/slide to verify|verify.*human|security.*check|verificação de segurança|vérification de sécurité|verificación de seguridad/i.test(text);
+                },
+                { timeout: config.humanSolveWaitMs }
+              );
+              snapshot = await readPageSnapshot(page);
+            }
+
+            if (isHumanCheck(snapshot.html, snapshot.pageTitle)) {
+              throw new UpstreamBlockError(
+                "Temu requested human verification (sliding puzzle) before exposing product data."
+              );
+            }
+
+            const networkData = extractApiData(bucket, productContext);
+            const structuredFallback = extractStructuredFallback(snapshot.html);
+            const domFallback = await extractDomFallback(page);
+            const mergedData = mergeProductData(productContext, [
+              networkData,
+              structuredFallback,
+              domFallback,
+            ]);
+
+            if (hasUsefulProductData(mergedData)) {
+              return mergedData;
+            }
+
+            throw new UpstreamBlockError(
+              "Temu did not expose enough product data for this request."
+            );
+          } finally {
+            detachCollector();
+          }
+        },
+        {
+          profileKey: attempt.profileKey,
+          proxyUrl: attempt.proxyUrl,
+        }
+      );
+
+      recordCandidateSuccess(attempt, {
+        outcome: "product-data",
+      });
+      await writeProductCacheEntry(merged);
+
+      return {
+        ...merged,
+        antiBot: {
+          ...createAttemptMetadata(attempt),
+          totalAttempts: attempts.length,
+          attemptsTried: failureHistory.length + 1,
+          attemptHistory: failureHistory,
+          proxyMetrics: getProxyMetrics(),
+        },
+      };
+    } catch (error) {
+      const classifiedError = classifyAttemptError(error);
+
+      failureHistory.push({
+        ...createAttemptMetadata(attempt),
+        message: classifiedError.message,
+        code: classifiedError.code,
+      });
+      recordCandidateFailure(attempt, {
+        outcome: classifiedError.code,
+        error: classifiedError.message,
+      });
+
+      if (!classifiedError.retryable) {
+        throw error;
+      }
+    }
+  }
+
+  if (cachedProducts[productContext.goodsId]) {
+    return buildCachedResponse(
+      cachedProducts[productContext.goodsId],
+      productContext,
+      attempts,
+      failureHistory
+    );
+  }
+
+  throw new UpstreamBlockError(
+    `Unable to fetch product data after ${attempts.length} attempts.`,
+    {
+      attemptsTried: attempts.length,
+      attemptHistory: failureHistory,
+      proxyMetrics: getProxyMetrics(),
+    }
+  );
+};

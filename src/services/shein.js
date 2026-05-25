@@ -19,15 +19,20 @@ const HUMAN_CHECK_PATTERNS = [
   /verify that you are human/i,
   /verificar que voce e humano/i,
   /verificar que você é humano/i,
+  /verificar que eres humano/i,
+  /vérifier que vous êtes humain/i,
   /sou humano/i,
   /captcha/i,
 ];
 
 const HUMAN_BUTTON_PATTERNS = [
   /sou humano/i,
+  /soy humano/i,
+  /je suis humain/i,
   /i am human/i,
   /verify/i,
   /verificar/i,
+  /vérifier/i,
   /continue/i,
 ];
 
@@ -36,6 +41,39 @@ const GENERIC_PAGE_TITLES = [
   /women'?s fashion|men'?s fashion/i,
   /^shein\b/i,
 ];
+
+const MARKET_STRINGS = {
+  pt: {
+    colorExtract: /Cor:?\s*([\p{L}\s-]+?)(?:Imagem grande|Tamanho|Guia de tamanhos|$)/iu,
+    sizeBlock: /Tamanho(?:EU Tamanho)?(?:\s*por favor escolha Tamanho)?([\s\S]{0,160}?)(?:Guia de tamanhos|ADICIONAR AO CARRINHO|Não é o seu tamanho|\n\n)/i,
+    colorLabelFilter: /^Cor\b/i,
+    largeImage: /Imagem grande/i,
+    showMoreColors: /Mostrar mais cores/i,
+  },
+  www: {
+    colorExtract: /Color:?\s*([\p{L}\s-]+?)(?:Large image|Size Guide|Size|$)/iu,
+    sizeBlock: /Size(?:\s*please select(?:\s*a)? size)?([\s\S]{0,160}?)(?:Size Guide|ADD TO CART|Not your size|\n\n)/i,
+    colorLabelFilter: /^Color\b/i,
+    largeImage: /Large image/i,
+    showMoreColors: /Show more colors/i,
+  },
+  es: {
+    colorExtract: /Color:?\s*([\p{L}\s-]+?)(?:Imagen grande|Talla|Guía de tallas|$)/iu,
+    sizeBlock: /Talla(?:EU Talla)?(?:\s*por favor elige(?:\s*la)? talla)?([\s\S]{0,160}?)(?:Guía de tallas|AÑADIR AL CARRITO|No es tu talla|\n\n)/i,
+    colorLabelFilter: /^Color\b/i,
+    largeImage: /Imagen grande/i,
+    showMoreColors: /Mostrar más colores/i,
+  },
+  fr: {
+    colorExtract: /Couleur:?\s*([\p{L}\s-]+?)(?:Grande image|Taille|Guide des tailles|$)/iu,
+    sizeBlock: /Taille(?:EU Taille)?(?:\s*veuillez choisir(?:\s*une)? taille)?([\s\S]{0,160}?)(?:Guide des tailles|AJOUTER AU PANIER|Pas votre taille|\n\n)/i,
+    colorLabelFilter: /^Couleur\b/i,
+    largeImage: /Grande image/i,
+    showMoreColors: /Afficher plus de couleurs/i,
+  },
+};
+
+const getMarketStrings = (market) => MARKET_STRINGS[market] ?? MARKET_STRINGS.www;
 
 export class UpstreamBlockError extends Error {
   constructor(message, details = {}) {
@@ -515,19 +553,16 @@ const extractHtmlFallback = (html, pageTitle) => {
   };
 };
 
-const extractTextFallback = (bodyText, pageTitle) => {
+const extractTextFallback = (bodyText, pageTitle, market) => {
+  const strings = getMarketStrings(market);
   const productText = extractProductSectionText(bodyText, pageTitle);
 
   if (!productText) {
     return null;
   }
 
-  const colorMatch =
-    productText.match(/Cor:\s*([\p{L}\s-]+?)(?:Imagem grande|Tamanho|Guia de tamanhos|$)/iu) ||
-    productText.match(/Cor\s*([\p{L}\s-]+?)(?:Imagem grande|Tamanho|Guia de tamanhos|$)/iu);
-  const sizeBlockMatch = productText.match(
-    /Tamanho(?:EU Tamanho)?(?:\s*por favor escolha Tamanho)?([\s\S]{0,160}?)(?:Guia de tamanhos|ADICIONAR AO CARRINHO|Não é o seu tamanho|\n\n)/i
-  );
+  const colorMatch = productText.match(strings.colorExtract);
+  const sizeBlockMatch = productText.match(strings.sizeBlock);
   const rawSizes = sizeBlockMatch?.[1] || productText;
   const sizes = unique(
     [
@@ -547,9 +582,21 @@ const extractTextFallback = (bodyText, pageTitle) => {
   };
 };
 
-const extractDomFallback = async (page) => {
+const extractDomFallback = async (page, market) => {
+  const { colorExtract, colorLabelFilter, largeImage, showMoreColors } = getMarketStrings(market);
+  const pageStrings = {
+    colorExtract: [colorExtract.source, colorExtract.flags],
+    colorLabelFilter: [colorLabelFilter.source, "i"],
+    largeImage: [largeImage.source, "i"],
+    showMoreColors: [showMoreColors.source, "i"],
+  };
+
   try {
-    const domData = await page.evaluate(() => {
+    const domData = await page.evaluate((s) => {
+      const colorExtractRe = new RegExp(...s.colorExtract);
+      const colorLabelFilterRe = new RegExp(...s.colorLabelFilter);
+      const largeImageRe = new RegExp(...s.largeImage);
+      const showMoreColorsRe = new RegExp(...s.showMoreColors);
       const compact = (value) =>
         typeof value === "string" ? value.replace(/\s+/g, " ").trim() : "";
       const unique = (values) => [...new Set(values.filter(Boolean))];
@@ -639,9 +686,7 @@ const extractDomFallback = async (page) => {
               variant.sku || variant.size || variant.color || variant.price || variant.url
             )
         : [];
-      const colorMatch =
-        bodyText.match(/Cor:\s*([\p{L}\s-]+?)(?:Imagem grande|Tamanho|Guia de tamanhos|$)/iu) ||
-        bodyText.match(/Cor\s*([\p{L}\s-]+?)(?:Imagem grande|Tamanho|Guia de tamanhos|$)/iu);
+      const colorMatch = bodyText.match(colorExtractRe);
       const colorSection =
         document.querySelector('.product-intro__color, [class*="product-intro__color"]') ||
         productIntro;
@@ -657,9 +702,9 @@ const extractDomFallback = async (page) => {
           .filter(
             (value) =>
               value &&
-              !/^Cor\b/i.test(value) &&
-              !/Imagem grande/i.test(value) &&
-              !/Mostrar mais cores/i.test(value)
+              !colorLabelFilterRe.test(value) &&
+              !largeImageRe.test(value) &&
+              !showMoreColorsRe.test(value)
           )
       );
       const activeColor = compact(
@@ -697,7 +742,7 @@ const extractDomFallback = async (page) => {
         variants: jsonLdVariants,
         images,
       };
-    });
+    }, pageStrings);
 
     if (!domData) {
       return null;
@@ -1053,7 +1098,7 @@ const trySolveHumanCheck = async (page) => {
     }
   }
 
-  const textLocator = page.getByText(/sou humano|i am human|verificar/i).first();
+  const textLocator = page.getByText(/sou humano|soy humano|je suis humain|i am human|verificar|vérifier/i).first();
 
   if ((await textLocator.count()) === 0) {
     return false;
@@ -1165,8 +1210,8 @@ export const fetchProductDetails = async (productUrl) => {
           const networkData = extractApiData(bucket, productContext);
           const structuredFallback = extractStructuredFallback(snapshot.html);
           const htmlFallback = extractHtmlFallback(snapshot.html, snapshot.pageTitle);
-          const domFallback = await extractDomFallback(page);
-          const textFallback = extractTextFallback(snapshot.bodyText, snapshot.pageTitle);
+          const domFallback = await extractDomFallback(page, productContext.market);
+          const textFallback = extractTextFallback(snapshot.bodyText, snapshot.pageTitle, productContext.market);
           const browserStorage = await readBrowserStorage(page);
           const storageFallback = extractStorageFallback(productContext, browserStorage);
           const mergedData = mergeProductData(productContext, [
