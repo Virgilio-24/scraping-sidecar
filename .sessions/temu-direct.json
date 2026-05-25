@@ -1,6 +1,16 @@
 {
   "cookies": [
     {
+      "name": "_GRECAPTCHA",
+      "value": "09AKhCRwhlVtDJSq_o-e7HVIblKWU9cA-tduvh_Lwo8jFeACDS1vztFlP_6nefquQBrVNgSHLCAaCGbXx8ulF--d4",
+      "domain": "www.google.com",
+      "path": "/recaptcha",
+      "expires": 1795296045.202982,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
       "name": "region",
       "value": "163",
       "domain": "www.temu.com",
@@ -55,7 +65,7 @@
       "value": "Europe%2FLisbon",
       "domain": "www.temu.com",
       "path": "/",
-      "expires": 1811261903.831438,
+      "expires": 1811280590.955616,
       "httpOnly": false,
       "secure": true,
       "sameSite": "Lax"
@@ -65,7 +75,7 @@
       "value": "avif%2Cwebp",
       "domain": "www.temu.com",
       "path": "/",
-      "expires": 1782317903.898395,
+      "expires": 1782336591.087346,
       "httpOnly": false,
       "secure": true,
       "sameSite": "Lax"
@@ -85,7 +95,7 @@
       "value": "dD8UPUBw5d3hNhjKOZ2Y5S1sbLLoRbHM",
       "domain": ".temu.com",
       "path": "/",
-      "expires": 1811261896.942693,
+      "expires": 1811280593.179762,
       "httpOnly": false,
       "secure": true,
       "sameSite": "Lax"
@@ -95,7 +105,7 @@
       "value": "dD8UPUBw5d3hNhjKOZ2Y5S1sbLLoRbHM",
       "domain": ".temu.com",
       "path": "/",
-      "expires": 1811261896.942932,
+      "expires": 1811280593.180115,
       "httpOnly": true,
       "secure": true,
       "sameSite": "Lax"
@@ -105,7 +115,7 @@
       "value": "58xllqdli9GwcEfDOAvMq",
       "domain": ".temu.com",
       "path": "/",
-      "expires": 1811261896.943031,
+      "expires": 1811280593.180282,
       "httpOnly": true,
       "secure": true,
       "sameSite": "Lax"
@@ -115,7 +125,7 @@
       "value": "L3yNcY4y6zz91pLEcQ==",
       "domain": ".temu.com",
       "path": "/",
-      "expires": 1811261896.943119,
+      "expires": 1811280593.180407,
       "httpOnly": true,
       "secure": true,
       "sameSite": "Lax"
@@ -135,7 +145,7 @@
       "value": "KHYUalQNEGdPft-9kl5Vbmj8",
       "domain": ".facebook.com",
       "path": "/",
-      "expires": 1814285868.770233,
+      "expires": 1814303996.55708,
       "httpOnly": true,
       "secure": true,
       "sameSite": "None"
@@ -145,17 +155,107 @@
       "value": "KHYUapbSo4CUUtqh4Xr7NGWG",
       "domain": ".facebook.com",
       "path": "/",
-      "expires": 1814285864.194265,
+      "expires": 1814304110.384057,
       "httpOnly": true,
       "secure": true,
       "sameSite": "None"
     },
     {
-      "name": "__cf_bm",
-      "value": "otFLLGFc8Kx.7OyUhWuRCGHsLXmXeURS1JlxxZrLvcE-1779725901.7383063-1.0.1.1-7dDgRyA9HHi.PVi8k.H7sOjkQQlR3jOhVkO6oDrdyGtCLBhfSvaK.qE3Vcdef2BGd.BCmtz_EbiRo_BNr4_mMQVWPKf_VA5Wq9U.IpwqAwM9TnnWsG0vQVUK5DDYwoR4",
+      "name": "wd",
+      "value": "600x679",
+      "domain": ".facebook.com",
+      "path": "/",
+      "expires": 1780348912,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "dpr",
+      "value": "1.0000000298023224",
+      "domain": ".facebook.com",
+      "path": "/",
+      "expires": 1780348916,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "c_user",
+      "value": "100007301379592",
+      "domain": ".facebook.com",
+      "path": "/",
+      "expires": 1811280112.257586,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "xs",
+      "value": "29%3Aqq49WfxJMJN9WA%3A2%3A1779744107%3A-1%3A-1%3A%3AAcwIoTsmRbu5Rg8Ek2dnm-g1bGvNZ_uA7-vt7F2VOg",
+      "domain": ".facebook.com",
+      "path": "/",
+      "expires": 1811280112.257739,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "verifyAuthToken",
+      "value": "n22aM_9UaXmd-taYj9IQyAeba8c3bb874cef3d1",
+      "domain": "www.temu.com",
+      "path": "/",
+      "expires": 1779830594.125596,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_hal_tag",
+      "value": "AOw08gBrsEbBlK8kvQ08b/WFfk4nbSGiQugarXpSKt9r2blK+AGto63WwRRApXNAJQ==",
+      "domain": ".www.temu.com",
+      "path": "/",
+      "expires": 1788384202.62996,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "AccessToken",
+      "value": "OKHBLVLDQU275K3LT3NRFR2D3M6PC653NYZJIPVS7OOAAF6BFPSA0110a34b4693",
       "domain": ".temu.com",
       "path": "/",
-      "expires": 1779727701.833732,
+      "expires": 1811280202.63005,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "user_uin",
+      "value": "BAPDMNPPV6LUVW76GON3ER6WSZO35YQPSGD7LG4W",
+      "domain": ".temu.com",
+      "path": "/",
+      "expires": 1811280202.630084,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "isLogin",
+      "value": "1779744202619",
+      "domain": ".temu.com",
+      "path": "/",
+      "expires": 1811280202.630132,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "__cf_bm",
+      "value": "4RFSuGjQTOwE4jOF0.NG.E2yqfwSiwOErx7ZzodZW70-1779744591.4274673-1.0.1.1-mNJ_Bi9AJC5unKTjKnD44RXk93homzRAR47lc2owy1CXW0lGJM.jIOeKI95QiuaOZfMeilTsY80SgumZbvMZ3ic8UYL2JLRKF83.MBSgUFa98SK39S9cn40XVm_3sCr2",
+      "domain": ".temu.com",
+      "path": "/",
+      "expires": 1779746391.483375,
       "httpOnly": true,
       "secure": true,
       "sameSite": "None"
@@ -174,8 +274,12 @@
           "value": "58xllqdli9GwcEfDOAvMq"
         },
         {
+          "name": "layer_ack_map",
+          "value": "{\"current\":{},\"next\":{}}"
+        },
+        {
           "name": "goods",
-          "value": "goods_ulxfys"
+          "value": "goods_kgfyrn"
         },
         {
           "name": "h_wjrpl",
@@ -183,7 +287,7 @@
         },
         {
           "name": "layout_tab",
-          "value": "[{\"page_sn\":10013,\"time\":1779725902728},{\"page_sn\":10005,\"time\":1779725901480}]"
+          "value": "[{\"page_sn\":10032,\"goods_id\":606365695196174,\"time\":1779744591039},{\"page_sn\":10032,\"goods_id\":606365695196174,\"time\":1779744586128}]"
         },
         {
           "name": "_nano_fp",
@@ -194,8 +298,16 @@
           "value": "{\"eu\":[]}"
         },
         {
+          "name": "renewal_token_time",
+          "value": "1779740605000"
+        },
+        {
           "name": "temu_monitor_build_version",
-          "value": "{\"/w/index.html\":807688284,\"/w/login.html\":2045944697,\"/w/goods.html\":2607308721}"
+          "value": "{\"/w/login.html\":520112094,\"/w/goods.html\":3017332463,\"/w/index.html\":2922444629}"
+        },
+        {
+          "name": "VerifyAuthToken",
+          "value": "n22aM_9UaXmd-taYj9IQyAeba8c3bb874cef3d1"
         },
         {
           "name": "becDeviceInfoRecorded",
@@ -203,7 +315,7 @@
         },
         {
           "name": "reported_i18n_keys",
-          "value": "{\"version\":1,\"lastResetTime\":1779720982196,\"keyMaps\":{\"pt-PT\":{\"bec-fe.cookie-prompt-new\":\"rich_text|0.text|0.isHtml|0.cookiePrivacyLink,wd_title,customize_button_text,reject_button_text,accept_button_text\",\"mobile-bg-web-home.home\":\"h1Title,recommend|title\",\"mobile-bg-web-home.error\":\"noItems|title|desc|button\",\"web-layout.nav\":\"skipto,maincontent\",\"web-shopping-cart.a11y\":\"xItemsInCart,uncheckedAll\",\"web-shopping-cart.global\":\"ShoppingCart|Subtotal|Gotocart|Warning.NoConnection,checkoutCount,SelectAll\",\"web-layout.category\":\"Categories\",\"web-layout.searchBar\":\"searchFieldDefault,Search,ShadeWord\",\"web-layout.layout-header\":\"HeaderNavOption|SignIn|OrdersAccount|Support\",\"mobile-bg-web-home.global\":\"itemPicture\",\"bui-web-goods-list.global\":\"reviews,stars,details\",\"web-layout.layout-footer\":\"footerBenefit|pricedrop|trackorders|checkout|lowstock|offers|expiration,SecureCertification,WeAccept\",\"web-layout.a11y\":\"download_app_store,download_google_play\",\"bec-fe.chat\":\"Messages\",\"web-layout.layout-toolbar\":\"Feedback|Feedback,Top\"}}}"
+          "value": "{\"version\":1,\"lastResetTime\":1779720982196,\"keyMaps\":{\"pt-PT\":{\"bec-fe.cookie-prompt-new\":\"rich_text|0.text|0.isHtml|0.cookiePrivacyLink,wd_title,customize_button_text,reject_button_text,accept_button_text\",\"mobile-bg-web-home.home\":\"h1Title,recommend|title\",\"mobile-bg-web-home.error\":\"noItems|title|desc|button\",\"web-layout.nav\":\"skipto,maincontent\",\"web-shopping-cart.a11y\":\"xItemsInCart,uncheckedAll\",\"web-shopping-cart.global\":\"ShoppingCart|Subtotal|Gotocart|Warning.NoConnection,checkoutCount,SelectAll\",\"web-layout.category\":\"Categories\",\"web-layout.searchBar\":\"searchFieldDefault,Search,ShadeWord\",\"web-layout.layout-header\":\"HeaderNavOption|SignIn|OrdersAccount|Support,helloUsername\",\"mobile-bg-web-home.global\":\"itemPicture\",\"bui-web-goods-list.global\":\"reviews,stars,details,itemPicture,openNewTab,quickLookBtn,addCart,topPicks,seeMore\",\"web-layout.layout-footer\":\"footerBenefit|pricedrop|trackorders|checkout|lowstock|offers|expiration,SecureCertification,WeAccept\",\"web-layout.a11y\":\"download_app_store,download_google_play\",\"bec-fe.chat\":\"Messages\",\"web-layout.layout-toolbar\":\"Feedback|Feedback,Top\",\"mobile-bg-web-commodity.goods\":\"main_gallery|goodsImage,review|reviews1|purchasesTips|noItemReviewYet,mallRating,mallInfo|Follow,shopAllItemsV2,goodsDetail|altDetails|goodsDetailTitle,fav|save,Check_this_item_out_on_Temu,sizeGuide|sizePopupTitle,main_detail|Added|qtyTitle,accessibility|selectButton,openInNewTab,recommend|recommendTitle|loadMore|isSoldoutTitle\",\"mobile-bg-web-commodity.comments\":\"allyStarText,seeAllReviews,allyAvatar,itemReviews\",\"web-share.a11y\":\"Share\",\"svg-icons.svg-icons-h5\":\"aria-label|InputShow|CartAddCart\",\"bec-fe.web-ui\":\"LoadMore|More\"}}}"
         },
         {
           "name": "sc_g_n",
@@ -215,8 +327,58 @@
       "origin": "https://www.facebook.com",
       "localStorage": [
         {
+          "name": "falco_queue_immediately^$100007301379592^#100007301379592^#^#hmac_ttl.1779744111.AR3OuKUKWyHmXvtZosI1n6UmppNXwDirsrK5npuYbWZ5ECoo^$f348cdf182e538bf9",
+          "value": "{\"items\":[{\"name\":\"web_time_spent_navigation\",\"policy\":{\"r\":1},\"time\":1779744116731.5,\"extra\":\"{\\\"cause\\\":\\\"unload\\\",\\\"custom_data_json\\\":\\\"{\\\\\\\"source_pa\\\\\\\":\\\\\\\"{}\\\\\\\",\\\\\\\"source_pav2\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"source_uri\\\\\\\":\\\\\\\"https://www.facebook.com/privacy/consent/?flow=gdp&params%5Bapp_id%5D=1779658199047189&params%5Bdisplay%5D=%22popup%22&params%5Bdomain%5D=%22www.temu.com%22&params%5Bfallback_redirect_uri%5D=%22https%3A%5C%2F%5C%2Fwww.temu.com%5C%2Flogin.html%3Ffrom%3Dhttps%5Cu00253A%5Cu00252F%5Cu00252Fwww.temu.com%5Cu00252Fpt%5Cu00252Fconjunto-de-camisola-e--de---de-cetim-para-mulheres-roupa-de-dormir-de-cor--com-decote-em-v-e--de--contrastante--para--as--elegante-roupa-de-casa-para--roupa-de-dormir-confort%5Cu002525C3%5Cu002525A1vel-roupa-de-dormir-elegante-acabamento-de-cetim-roupa-de-dormir-para-mulheres-camisola-para-mulheres-roupa-interior-para-mulheres-conjunto-de-pijama-de-cetim-para-mulheres-g-601099555477841.html%5Cu00253Ftop_gallery_url%5Cu00253Dhttps%5Cu0025253A%5Cu0025252F%5Cu0025252Fimg.kwcdn.com%5Cu0025252Fproduct%5Cu0025252Ffancy%5Cu0025252Fcb53fe42-5c02-434a-93e9-b41568d24bde.jpg%5Cu00252526spec_id%5Cu0025253D15067%5Cu00252526spec_gallery_id%5Cu0025253D1005%5Cu00252526refer_page_sn%5Cu0025253D10005%5Cu00252526freesia_scene%5Cu0025253D1%5Cu00252526_oak_freesia_scene%5Cu0025253D1%5Cu00252526_oak_rec_ext_1%5Cu0025253DNTkz%5Cu00252526_oak_gallery_order%5Cu0025253D998261637%5Cu0025252C1171169460%5Cu0025252C386719375%5Cu0025252C1057664200%5Cu0025252C529760259%5Cu00252526_oak_mp_inf%5Cu0025253DENGy6qum1ogBGiAwNzI3ZDk4MjU4ZWQ0MDFiOWNlY2I2M2M4ZGU4M2E1NSDTveCG5jM%5Cu0025253D%5Cu00252526spec_ids%5Cu0025253D15067%5Cu0025252C16057%5Cu0025252C16084%5Cu0025252C2001%5Cu0025252C15092%5Cu0025252C2%5Cu0025252C3002%5Cu0025252C15082%5Cu00252526refer_page_el_sn%5Cu0025253D200024%5Cu00252526refer_page_name%5Cu0025253Dhome%5Cu00252526refer_page_id%5Cu0025253D10005_1779741236387_i4l5t1dz7r%5Cu00252526_x_sessn_id%5Cu0025253Dodixyu4iy2%26login_scene%3D2%26refer_page_name%3Dgoods%26refer_page_id%3D10032_1779743964615_y5bwkictft%26refer_page_sn%3D10032%26_x_sessn_id%3D2mz5t7alo0%22&params%5Blogger_id%5D=%22f2df46f93ba04bb9a%22&params%5Bnext%5D=%22confirm%22&params%5Bredirect_uri%5D=%22https%3A%5C%2F%5C%2Fstaticxx.facebook.com%5C%2Fx%5C%2Fconnect%5C%2Fxd_arbiter%5C%2F%3Fversion%3D46%23cb%3Df8e068c3a586da483%26domain%3Dwww.temu.com%26is_canvas%3Dfalse%26origin%3Dhttps%5Cu00253A%5Cu00252F%5Cu00252Fwww.temu.com%5Cu00252Ff9e4600180c37a47d%26relation%3Dopener%26frame%3Dffd0b28821ca1fe93%22&params%5Bret%5D=%22login%22&params%5Bresponse_type%5D=%22token%2Csigned_request%2Cgraph_domain%22&params%5Bscope%5D=%5B%22email%22%2C%22public_profile%22%5D&params%5Bsdk%5D=%22joey%22&params%5Bsteps%5D=%7B%7D&params%5Bversioned_sdk%5D=%22joey%22&params%5Bcui_gk%5D=%22%5BPASS%5D%3Ajssdk%2Cconfirm%22&source=gdp_delegated&cache_buster=5806720539850597966\\\\\\\",\\\\\\\"source_visitation_id\\\\\\\":\\\\\\\"XPrivacyConsentController:dxyq2e:1:1779744111.668\\\\\\\"}\\\",\\\"sid_raw\\\":\\\"97gwf4:oz6s8v:dxyq2e\\\",\\\"source_path\\\":\\\"XPrivacyConsentController\\\"}\",\"tags\":[1,128],\"sessionId\":\"97gwf4:oz6s8v:dxyq2e\",\"deviceId\":\"fd.ARvpW3eiOVatcWTKRoLShuZSZCJRjzQtB-kV9dHeN1dV2io2sogQptZaDBCulTUMunB7pspUm1QS6f2rMsaLZfgK\",\"appVersion\":\"1040.105.927.0 (1040105927)\"},{\"name\":\"web_time_spent_bit_array\",\"policy\":{\"r\":1},\"time\":1779744116731.7,\"extra\":\"{\\\"sid_raw\\\":\\\"97gwf4:oz6s8v:dxyq2e\\\",\\\"start_endpoint\\\":\\\"XPrivacyConsentController\\\",\\\"start_event\\\":\\\"init\\\",\\\"start_time\\\":1779744111,\\\"tos_array\\\":[61,0],\\\"tos_cum\\\":5,\\\"tos_id\\\":\\\"dxyq2e\\\",\\\"tos_len\\\":6,\\\"tos_seq\\\":0}\",\"tags\":[1,128],\"sessionId\":\"97gwf4:oz6s8v:dxyq2e\",\"deviceId\":\"fd.ARvpW3eiOVatcWTKRoLShuZSZCJRjzQtB-kV9dHeN1dV2io2sogQptZaDBCulTUMunB7pspUm1QS6f2rMsaLZfgK\",\"appVersion\":\"1040.105.927.0 (1040105927)\"}],\"ts\":1779744116731.8}"
+        },
+        {
+          "name": "falco_queue_critical^$100007301379592^#100007301379592^#^#hmac_ttl.1779744111.AR3OuKUKWyHmXvtZosI1n6UmppNXwDirsrK5npuYbWZ5ECoo^$fcab45ed3ae8b8ed1",
+          "value": "{\"items\":[{\"name\":\"ods_web_batch\",\"policy\":{\"r\":1,\"s\":1},\"time\":1779744116731.2,\"extra\":\"{\\\"batch\\\":{\\\"110\\\":{\\\"TransportSelectingClient\\\":{\\\"Falco.dgw_client.request_stream\\\":{\\\"n\\\":1,\\\"d\\\":null}}},\\\"1678\\\":{\\\"www_client_navigations\\\":{\\\"NAVIGATE\\\":{\\\"n\\\":1,\\\"d\\\":null}}},\\\"3589\\\":{\\\"dgw_web_client\\\":{\\\"realtime.WebSocketTransport.stream_group_establishment_pending\\\":{\\\"n\\\":1,\\\"d\\\":null},\\\"realtime.WebSocketTransport.stream_group_establishment_success\\\":{\\\"n\\\":1,\\\"d\\\":null},\\\"realtime.DGWPinger.reset.newtimeout\\\":{\\\"n\\\":5,\\\"d\\\":null},\\\"realtime.WebSocketTransport.stream_establishment_pending\\\":{\\\"n\\\":1,\\\"d\\\":null},\\\"realtime.DGWPinger.reset\\\":{\\\"n\\\":4,\\\"d\\\":null},\\\"realtime.WebSocketTransport.stream_establishment_success\\\":{\\\"n\\\":1,\\\"d\\\":null},\\\"realtime.WebStreamAckManager.ack_expected\\\":{\\\"n\\\":1,\\\"d\\\":null},\\\"realtime.GroupedWebStream.ack_received\\\":{\\\"n\\\":1,\\\"d\\\":null},\\\"realtime.WebStreamAckManager.ack_received\\\":{\\\"n\\\":1,\\\"d\\\":null},\\\"realtime.GroupedWebStream.data_received\\\":{\\\"n\\\":2,\\\"d\\\":null},\\\"realtime.GroupedWebStream.ack_sent\\\":{\\\"n\\\":2,\\\"d\\\":null}}},\\\"7173\\\":{\\\"entities.ff_js_web.comet_auto_logging.2220391788200892.1040.C3\\\":{\\\"event.logged\\\":{\\\"n\\\":5,\\\"d\\\":null},\\\"event.filters.sampling\\\":{\\\"n\\\":5,\\\"d\\\":null}},\\\"entities.ff_js_web.web_time_spent_navigation.2220391788200892.1040.C3\\\":{\\\"event.logged\\\":{\\\"n\\\":1,\\\"d\\\":null},\\\"event.captured\\\":{\\\"n\\\":1,\\\"d\\\":null},\\\"event.info.upload_method.streaming.log_immediately\\\":{\\\"n\\\":2,\\\"d\\\":null},\\\"event.info.streaming.batched\\\":{\\\"n\\\":2,\\\"d\\\":null},\\\"event.info.streaming.batch_processing\\\":{\\\"n\\\":2,\\\"d\\\":null},\\\"event.non_critical_failure.streaming_init_not_complete\\\":{\\\"n\\\":2,\\\"d\\\":null},\\\"event.info.banzai.log_immediately.upload_processing\\\":{\\\"n\\\":2,\\\"d\\\":null},\\\"event.uploaded\\\":{\\\"n\\\":2,\\\"d\\\":null}},\\\"entities.ff_js_web.web_time_spent_bit_array.2220391788200892.1040.C3\\\":{\\\"event.info.upload_method.streaming.log_immediately\\\":{\\\"n\\\":1,\\\"d\\\":null},\\\"event.info.streaming.batched\\\":{\\\"n\\\":1,\\\"d\\\":null}},\\\"entities.ff_js_web.jstl_migration.2220391788200892.1040.C3\\\":{\\\"event.logged\\\":{\\\"n\\\":1,\\\"d\\\":null},\\\"event.info.upload_method.streaming.log\\\":{\\\"n\\\":1,\\\"d\\\":null},\\\"event.info.streaming.batched\\\":{\\\"n\\\":1,\\\"d\\\":null},\\\"event.captured\\\":{\\\"n\\\":1,\\\"d\\\":null}},\\\"entities.ff_js_web.web_perf_device_info_log.2220391788200892.1040.C3\\\":{\\\"event.logged\\\":{\\\"n\\\":1,\\\"d\\\":null},\\\"event.info.upload_method.streaming.log\\\":{\\\"n\\\":1,\\\"d\\\":null},\\\"event.info.streaming.batched\\\":{\\\"n\\\":1,\\\"d\\\":null},\\\"event.captured\\\":{\\\"n\\\":1,\\\"d\\\":null}}}}}\",\"tags\":[1,128],\"sessionId\":\"97gwf4:oz6s8v:dxyq2e\",\"deviceId\":\"fd.ARvpW3eiOVatcWTKRoLShuZSZCJRjzQtB-kV9dHeN1dV2io2sogQptZaDBCulTUMunB7pspUm1QS6f2rMsaLZfgK\",\"appVersion\":\"1040.105.927.0 (1040105927)\"}],\"ts\":1779744116731.2}"
+        },
+        {
+          "name": "hb_timestamp",
+          "value": "1779744027658"
+        },
+        {
+          "name": "falco_queue_log^$100007301379592^#100007301379592^#^#hmac_ttl.1779744111.AR3OuKUKWyHmXvtZosI1n6UmppNXwDirsrK5npuYbWZ5ECoo^$fddff91e9d12ee187",
+          "value": "{\"items\":[{\"name\":\"jstl_migration\",\"policy\":{\"r\":1},\"time\":1779744112067.3,\"extra\":\"{\\\"logger_config_name\\\":\\\"WebBrowserDimensionsLoggerConfig\\\",\\\"payload\\\":{\\\"pixel_ratio\\\":1.0000000298023224,\\\"screen_x\\\":600,\\\"screen_y\\\":679,\\\"server_pixel_ratio\\\":1,\\\"viewport_x\\\":600,\\\"viewport_y\\\":679,\\\"cpu_cores_count\\\":8,\\\"zoom_ratio\\\":1.03,\\\"document_font_size\\\":\\\"16px\\\",\\\"__options\\\":{\\\"event_time\\\":1779744112.067}}}\",\"tags\":[1,384],\"sessionId\":\"97gwf4:oz6s8v:dxyq2e\",\"deviceId\":\"fd.ARvpW3eiOVatcWTKRoLShuZSZCJRjzQtB-kV9dHeN1dV2io2sogQptZaDBCulTUMunB7pspUm1QS6f2rMsaLZfgK\",\"appVersion\":\"1040.105.927.0 (1040105927)\",\"shouldAddState\":true},{\"name\":\"web_perf_device_info_log\",\"policy\":{\"r\":1,\"s\":1},\"time\":1779744112143.1,\"extra\":\"{\\\"cpu_cores\\\":8,\\\"ram\\\":16,\\\"gpu_renderer\\\":\\\"ANGLE (Intel, Intel(R) UHD Graphics (0x00009B41) Direct3D11 vs_5_0 ps_5_0, D3D11)\\\",\\\"gpu_vendor\\\":\\\"Google Inc. (Intel)\\\"}\",\"tags\":[1,384],\"sessionId\":\"97gwf4:oz6s8v:dxyq2e\",\"deviceId\":\"fd.ARvpW3eiOVatcWTKRoLShuZSZCJRjzQtB-kV9dHeN1dV2io2sogQptZaDBCulTUMunB7pspUm1QS6f2rMsaLZfgK\",\"appVersion\":\"1040.105.927.0 (1040105927)\"}],\"ts\":1779744116517.6}"
+        },
+        {
+          "name": "falco_queue_immediately^$^$fc7c6945b8ce54743",
+          "value": "{\"items\":[{\"name\":\"web_time_spent_bit_array\",\"policy\":{\"r\":1},\"time\":1779744111356.9,\"extra\":\"{\\\"sid_raw\\\":\\\"97gwf4:oz6s8v:ky30mq\\\",\\\"start_endpoint\\\":\\\"two_step_verification.pre_authentication\\\",\\\"start_event\\\":\\\"scroll\\\",\\\"start_time\\\":1779744107,\\\"tos_array\\\":[1,0],\\\"tos_cum\\\":6,\\\"tos_id\\\":\\\"ky30mq\\\",\\\"tos_len\\\":5,\\\"tos_seq\\\":1}\",\"tags\":[1,392],\"sessionId\":\"97gwf4:oz6s8v:ky30mq\",\"deviceId\":\"fd.ARvpW3eiOVatcWTKRoLShuZSZCJRjzQtB-kV9dHeN1dV2io2sogQptZaDBCulTUMunB7pspUm1QS6f2rMsaLZfgK\",\"appVersion\":\"1040.105.927.0 (1040105927)\",\"shouldAddState\":true,\"logImmediate\":true}],\"ts\":1779744116517.7}"
+        },
+        {
+          "name": "signal_flush_timestamp",
+          "value": "1779743997715"
+        },
+        {
           "name": "Session",
-          "value": "w4ddqe:1779725921059"
+          "value": "97gwf4:1779744151731"
+        },
+        {
+          "name": "banzai:last_storage_flush",
+          "value": "1779743998262.9"
+        }
+      ]
+    },
+    {
+      "origin": "https://www.fbsbx.com",
+      "localStorage": [
+        {
+          "name": "_grecaptcha",
+          "value": "09AKhCRwjQo2NNCzJvIlCxmoHYjDx2NScxl5fLnyf74AjYXs-Jep8VVJ9o5ObLepH7CVSefoEyyiY-3SVk6Iw4_RUX5RY0aPKS-rfbCe0mjGL320XoRm5DrnLD9-iPgu-_"
+        }
+      ]
+    },
+    {
+      "origin": "https://www.google.com",
+      "localStorage": [
+        {
+          "name": "rc::a",
+          "value": "ZW9qdzc5MTkxaDh0dw=="
+        },
+        {
+          "name": "rc::f",
+          "value": "0aAEc790JgX0tsLU98f2LKfyCRPgJT4g5SIrYdoIwidxPAOL_vkJ9sl34rI9JlBJoCR6WICS4"
         }
       ]
     }
