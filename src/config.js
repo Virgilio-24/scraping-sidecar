@@ -32,6 +32,8 @@ export const config = {
   retryAttempts: Math.max(numberFromEnv(process.env.RETRY_ATTEMPTS, 3), 1),
   prewarmHomeMs: Math.max(numberFromEnv(process.env.PREWARM_HOME_MS, 2500), 0),
   humanSolveWaitMs: Math.max(numberFromEnv(process.env.HUMAN_SOLVE_WAIT_MS, 6000), 0),
+  verificationWaitMs: Math.max(numberFromEnv(process.env.VERIFICATION_WAIT_MS, 300000), 0),
+  loginWaitMs: Math.max(numberFromEnv(process.env.LOGIN_WAIT_MS, 300000), 0),
   sessionStateDir: process.env.SESSION_STATE_DIR || ".sessions",
   proxyUrls: parseProxyList(process.env.PROXY_URLS),
   userAgent:
