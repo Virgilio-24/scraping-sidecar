@@ -1,7 +1,10 @@
 import fs from "fs/promises";
 import path from "path";
-import { chromium } from "playwright";
+import { chromium } from "playwright-extra";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { config, resolveProjectPath } from "../config.js";
+
+chromium.use(StealthPlugin());
 
 const browserPromises = new Map();
 
