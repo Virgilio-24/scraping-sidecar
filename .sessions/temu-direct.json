@@ -65,7 +65,7 @@
       "value": "Europe%2FLisbon",
       "domain": "www.temu.com",
       "path": "/",
-      "expires": 1811280590.955616,
+      "expires": 1811338580.584986,
       "httpOnly": false,
       "secure": true,
       "sameSite": "Lax"
@@ -75,7 +75,7 @@
       "value": "avif%2Cwebp",
       "domain": "www.temu.com",
       "path": "/",
-      "expires": 1782336591.087346,
+      "expires": 1782394580.677866,
       "httpOnly": false,
       "secure": true,
       "sameSite": "Lax"
@@ -95,7 +95,7 @@
       "value": "dD8UPUBw5d3hNhjKOZ2Y5S1sbLLoRbHM",
       "domain": ".temu.com",
       "path": "/",
-      "expires": 1811280593.179762,
+      "expires": 1811333815.949785,
       "httpOnly": false,
       "secure": true,
       "sameSite": "Lax"
@@ -105,7 +105,7 @@
       "value": "dD8UPUBw5d3hNhjKOZ2Y5S1sbLLoRbHM",
       "domain": ".temu.com",
       "path": "/",
-      "expires": 1811280593.180115,
+      "expires": 1811333815.950024,
       "httpOnly": true,
       "secure": true,
       "sameSite": "Lax"
@@ -115,7 +115,7 @@
       "value": "58xllqdli9GwcEfDOAvMq",
       "domain": ".temu.com",
       "path": "/",
-      "expires": 1811280593.180282,
+      "expires": 1811333815.950112,
       "httpOnly": true,
       "secure": true,
       "sameSite": "Lax"
@@ -125,7 +125,7 @@
       "value": "L3yNcY4y6zz91pLEcQ==",
       "domain": ".temu.com",
       "path": "/",
-      "expires": 1811280593.180407,
+      "expires": 1811333815.950187,
       "httpOnly": true,
       "secure": true,
       "sameSite": "Lax"
@@ -252,10 +252,10 @@
     },
     {
       "name": "__cf_bm",
-      "value": "4RFSuGjQTOwE4jOF0.NG.E2yqfwSiwOErx7ZzodZW70-1779744591.4274673-1.0.1.1-mNJ_Bi9AJC5unKTjKnD44RXk93homzRAR47lc2owy1CXW0lGJM.jIOeKI95QiuaOZfMeilTsY80SgumZbvMZ3ic8UYL2JLRKF83.MBSgUFa98SK39S9cn40XVm_3sCr2",
+      "value": "TjJnaw8cazMYAXET58YVQ0yqTugB5OdcxxgMQEAvOS4-1779802581.1596274-1.0.1.1-PGQRJdDw_klFo4Mz32jdKtfneyBzLKDDAnSnXQs6agkzHA_..Ukkzt1fhdurtDrIaXRl65bTa1wHH3NCH8bCadEDAr83vElT_H5s_TguZxct_BmM4YqWXlLgzPcoASJz",
       "domain": ".temu.com",
       "path": "/",
-      "expires": 1779746391.483375,
+      "expires": 1779804381.243112,
       "httpOnly": true,
       "secure": true,
       "sameSite": "None"
@@ -279,7 +279,7 @@
         },
         {
           "name": "goods",
-          "value": "goods_kgfyrn"
+          "value": "goods_6rab3h"
         },
         {
           "name": "h_wjrpl",
@@ -287,7 +287,7 @@
         },
         {
           "name": "layout_tab",
-          "value": "[{\"page_sn\":10032,\"goods_id\":606365695196174,\"time\":1779744591039},{\"page_sn\":10032,\"goods_id\":606365695196174,\"time\":1779744586128}]"
+          "value": "[{\"page_sn\":10032,\"goods_id\":603384820143426,\"time\":1779802580838},{\"page_sn\":10005,\"time\":1779802576073}]"
         },
         {
           "name": "_nano_fp",
@@ -299,11 +299,11 @@
         },
         {
           "name": "renewal_token_time",
-          "value": "1779740605000"
+          "value": "1779792157000"
         },
         {
           "name": "temu_monitor_build_version",
-          "value": "{\"/w/login.html\":520112094,\"/w/goods.html\":3017332463,\"/w/index.html\":2922444629}"
+          "value": "{\"/w/login.html\":520112094,\"/w/goods.html\":3017332463,\"/w/index.html\":2561103958}"
         },
         {
           "name": "VerifyAuthToken",
@@ -315,7 +315,7 @@
         },
         {
           "name": "reported_i18n_keys",
-          "value": "{\"version\":1,\"lastResetTime\":1779720982196,\"keyMaps\":{\"pt-PT\":{\"bec-fe.cookie-prompt-new\":\"rich_text|0.text|0.isHtml|0.cookiePrivacyLink,wd_title,customize_button_text,reject_button_text,accept_button_text\",\"mobile-bg-web-home.home\":\"h1Title,recommend|title\",\"mobile-bg-web-home.error\":\"noItems|title|desc|button\",\"web-layout.nav\":\"skipto,maincontent\",\"web-shopping-cart.a11y\":\"xItemsInCart,uncheckedAll\",\"web-shopping-cart.global\":\"ShoppingCart|Subtotal|Gotocart|Warning.NoConnection,checkoutCount,SelectAll\",\"web-layout.category\":\"Categories\",\"web-layout.searchBar\":\"searchFieldDefault,Search,ShadeWord\",\"web-layout.layout-header\":\"HeaderNavOption|SignIn|OrdersAccount|Support,helloUsername\",\"mobile-bg-web-home.global\":\"itemPicture\",\"bui-web-goods-list.global\":\"reviews,stars,details,itemPicture,openNewTab,quickLookBtn,addCart,topPicks,seeMore\",\"web-layout.layout-footer\":\"footerBenefit|pricedrop|trackorders|checkout|lowstock|offers|expiration,SecureCertification,WeAccept\",\"web-layout.a11y\":\"download_app_store,download_google_play\",\"bec-fe.chat\":\"Messages\",\"web-layout.layout-toolbar\":\"Feedback|Feedback,Top\",\"mobile-bg-web-commodity.goods\":\"main_gallery|goodsImage,review|reviews1|purchasesTips|noItemReviewYet,mallRating,mallInfo|Follow,shopAllItemsV2,goodsDetail|altDetails|goodsDetailTitle,fav|save,Check_this_item_out_on_Temu,sizeGuide|sizePopupTitle,main_detail|Added|qtyTitle,accessibility|selectButton,openInNewTab,recommend|recommendTitle|loadMore|isSoldoutTitle\",\"mobile-bg-web-commodity.comments\":\"allyStarText,seeAllReviews,allyAvatar,itemReviews\",\"web-share.a11y\":\"Share\",\"svg-icons.svg-icons-h5\":\"aria-label|InputShow|CartAddCart\",\"bec-fe.web-ui\":\"LoadMore|More\"}}}"
+          "value": "{\"version\":1,\"lastResetTime\":1779720982196,\"keyMaps\":{\"pt-PT\":{\"bec-fe.cookie-prompt-new\":\"rich_text|0.text|0.isHtml|0.cookiePrivacyLink,wd_title,customize_button_text,reject_button_text,accept_button_text\",\"mobile-bg-web-home.home\":\"h1Title,recommend|title\",\"mobile-bg-web-home.error\":\"noItems|title|desc|button\",\"web-layout.nav\":\"skipto,maincontent\",\"web-shopping-cart.a11y\":\"xItemsInCart,uncheckedAll\",\"web-shopping-cart.global\":\"ShoppingCart|Subtotal|Gotocart|Warning.NoConnection,checkoutCount,SelectAll\",\"web-layout.category\":\"Categories\",\"web-layout.searchBar\":\"searchFieldDefault,Search,ShadeWord\",\"web-layout.layout-header\":\"HeaderNavOption|SignIn|OrdersAccount|Support,helloUsername\",\"mobile-bg-web-home.global\":\"itemPicture\",\"bui-web-goods-list.global\":\"reviews,stars,details,itemPicture,openNewTab,quickLookBtn,addCart,topPicks,seeMore,originalPrice\",\"web-layout.layout-footer\":\"footerBenefit|pricedrop|trackorders|checkout|lowstock|offers|expiration,SecureCertification,WeAccept\",\"web-layout.a11y\":\"download_app_store,download_google_play\",\"bec-fe.chat\":\"Messages\",\"web-layout.layout-toolbar\":\"Feedback|Feedback,Top\",\"mobile-bg-web-commodity.goods\":\"main_gallery|goodsImage,review|reviews1|purchasesTips|noItemReviewYet,mallRating,mallInfo|Follow,shopAllItemsV2,goodsDetail|altDetails|goodsDetailTitle,fav|save,Check_this_item_out_on_Temu,sizeGuide|sizePopupTitle,main_detail|Added|qtyTitle,accessibility|selectButton,openInNewTab,recommend|recommendTitle|loadMore|isSoldoutTitle\",\"mobile-bg-web-commodity.comments\":\"allyStarText,seeAllReviews,allyAvatar,itemReviews\",\"web-share.a11y\":\"Share\",\"svg-icons.svg-icons-h5\":\"aria-label|InputShow|CartAddCart\",\"bec-fe.web-ui\":\"LoadMore|More\"}}}"
         },
         {
           "name": "sc_g_n",
