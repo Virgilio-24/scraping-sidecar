@@ -102,6 +102,27 @@ const normalizeImageUrl = (value) => {
   return value;
 };
 
+const upgradeImageResolution = (url) => {
+  if (!url) return url;
+  return url.replace(/([?&])imwidth=\d+/, "$1imwidth=2000");
+};
+
+const MARKET_CURRENCY = {
+  pt: "€", es: "€", de: "€", fr: "€", it: "€",
+  nl: "€", be: "€", at: "€", pl: "zł",
+  uk: "£", ch: "CHF", se: "kr", no: "kr", dk: "kr",
+};
+
+const formatPrice = (amount, market) => {
+  if (!amount) return null;
+  const symbol = MARKET_CURRENCY[market] || "€";
+  const num = parseFloat(amount);
+  if (isNaN(num)) return null;
+  return ["uk", "ch"].includes(market)
+    ? `${symbol} ${num.toFixed(2)}`
+    : `${num.toFixed(2)} ${symbol}`;
+};
+
 const normalizeVariant = (variant) => {
   if (!variant || typeof variant !== "object") {
     return null;
@@ -117,25 +138,6 @@ const normalizeVariant = (variant) => {
   };
 };
 
-const normalizePrice = (value) => {
-  if (value === null || value === undefined) {
-    return null;
-  }
-
-  if (typeof value === "number") {
-    if (Number.isInteger(value) && value > 1000) {
-      return String(value / 100);
-    }
-
-    return String(value);
-  }
-
-  if (typeof value === "string" && value.trim()) {
-    return value.trim();
-  }
-
-  return null;
-};
 
 const getProductCachePath = () => {
   const directoryPath = resolveProjectPath(config.sessionStateDir);
@@ -289,164 +291,8 @@ const findProductJsonLd = (blocks) => {
   return null;
 };
 
-const looksLikeProductNode = (obj) => {
-  if (!obj || typeof obj !== "object" || Array.isArray(obj)) {
-    return false;
-  }
 
-  const keys = new Set(Object.keys(obj));
-  const hasName = keys.has("name") || keys.has("displayName") || keys.has("title");
-  const hasPrice = keys.has("price");
-  const hasBrand = keys.has("brand") || keys.has("brandName");
-  const hasMedia = keys.has("media") || keys.has("images");
-  const hasSizes = keys.has("sizes");
-
-  return hasName && (hasPrice || hasBrand || hasMedia || hasSizes);
-};
-
-const findNextDataProduct = (nextData) => {
-  if (!nextData || typeof nextData !== "object") {
-    return null;
-  }
-
-  const priorityPaths = [
-    nextData?.props?.pageProps?.model,
-    nextData?.props?.pageProps?.article,
-    nextData?.props?.pageProps?.product,
-    nextData?.props?.pageProps?.pdpData?.product,
-    nextData?.props?.pageProps?.data?.product,
-  ];
-
-  for (const candidate of priorityPaths) {
-    if (looksLikeProductNode(candidate)) {
-      return candidate;
-    }
-  }
-
-  const queue = [nextData];
-  const seen = new Set();
-
-  while (queue.length > 0) {
-    const current = queue.shift();
-
-    if (!current || typeof current !== "object" || seen.has(current)) {
-      continue;
-    }
-
-    seen.add(current);
-
-    if (Array.isArray(current)) {
-      queue.push(...current.slice(0, 20));
-      continue;
-    }
-
-    if (looksLikeProductNode(current)) {
-      return current;
-    }
-
-    for (const value of Object.values(current)) {
-      if (value && typeof value === "object") {
-        queue.push(value);
-      }
-    }
-  }
-
-  return null;
-};
-
-const extractNextDataLayer = (html) => {
-  const scriptMatch = html.match(/<script[^>]*id=["']__NEXT_DATA__["'][^>]*>([\s\S]*?)<\/script>/i);
-
-  if (!scriptMatch) {
-    return null;
-  }
-
-  let nextData;
-
-  try {
-    nextData = JSON.parse(scriptMatch[1]);
-  } catch {
-    return null;
-  }
-
-  const product = findNextDataProduct(nextData);
-
-  if (!product) {
-    return null;
-  }
-
-  const title = firstNonEmpty(product.name, product.displayName, product.title);
-  const brand = firstNonEmpty(product.brand?.name, product.brandName);
-
-  const priceObj = product.price || {};
-  const currentPrice = priceObj.current?.value ?? priceObj.promotional?.value ?? null;
-  const originalPrice = priceObj.original?.value ?? null;
-  const currency = priceObj.currency ?? null;
-  const priceAmount = normalizePrice(currentPrice);
-  const retailAmount = normalizePrice(originalPrice);
-
-  let discountPercent = null;
-
-  if (priceAmount && retailAmount) {
-    const sale = parseFloat(priceAmount);
-    const retail = parseFloat(retailAmount);
-
-    if (retail > sale) {
-      discountPercent = String(Math.round(((retail - sale) / retail) * 100));
-    }
-  }
-
-  const color = firstNonEmpty(product.color, product.defaultColor, product.colorDescription);
-
-  const sizesRaw = Array.isArray(product.sizes) ? product.sizes : [];
-  const sizes = unique(
-    sizesRaw
-      .map((s) => firstNonEmpty(s?.size, s?.label, s?.name, typeof s === "string" ? s : null))
-      .filter(Boolean)
-  );
-
-  const mediaImages = product.media?.images || product.images || [];
-  const images = unique(
-    (Array.isArray(mediaImages) ? mediaImages : [])
-      .map((img) => {
-        if (typeof img === "string") {
-          return normalizeImageUrl(img);
-        }
-
-        if (img && typeof img === "object") {
-          return normalizeImageUrl(
-            img.large || img.url || img.thumbnail || img.src
-          );
-        }
-
-        return null;
-      })
-      .filter(Boolean)
-  );
-
-  const articleId = firstNonEmpty(product.articleId, product.id, product.sku);
-
-  return {
-    articleId: articleId ? articleId.toUpperCase() : null,
-    title,
-    brand,
-    color,
-    colors: color ? [color] : [],
-    sizes,
-    variants: [],
-    price: {
-      amount: priceAmount,
-      formatted: priceAmount && currency ? `${priceAmount} ${currency}` : priceAmount,
-      retailAmount,
-      retailFormatted: retailAmount && currency ? `${retailAmount} ${currency}` : retailAmount,
-      discountPercent,
-    },
-    images,
-    sourceStage: "next-data",
-  };
-};
-
-const extractJsonLdLayer = (html) => {
+const extractJsonLdLayer = (html, market) => {
   const jsonLdBlocks = parseJsonLdBlocks(html);
   const product = findProductJsonLd(jsonLdBlocks);
 
@@ -474,6 +320,11 @@ const extractJsonLdLayer = (html) => {
       )
     : [];
 
+  const priceAmount = firstNonEmpty(
+    variantOffer?.price != null ? String(variantOffer.price) : null,
+    product.offers?.price != null ? String(product.offers.price) : null
+  );
+
   return {
     articleId: null,
     title: firstNonEmpty(product.name, firstVariant?.name),
@@ -483,8 +334,8 @@ const extractJsonLdLayer = (html) => {
     sizes: unique(variants.map((v) => v.size)),
     variants,
     price: {
-      amount: firstNonEmpty(variantOffer?.price, product.offers?.price),
-      formatted: null,
+      amount: priceAmount,
+      formatted: formatPrice(priceAmount, market),
       retailAmount: null,
       retailFormatted: null,
       discountPercent: null,
@@ -492,7 +343,7 @@ const extractJsonLdLayer = (html) => {
     images: unique(
       (Array.isArray(product.image) ? product.image : [product.image])
         .filter(Boolean)
-        .map(normalizeImageUrl)
+        .map((url) => upgradeImageResolution(normalizeImageUrl(url)))
     ),
     sourceStage: "json-ld",
   };
@@ -530,6 +381,13 @@ const extractDomFallback = async (page) => {
       const priceText = priceEl ? compact(priceEl.textContent) : null;
       const priceMatch = priceText ? priceText.match(/[\d.,]+/) : null;
       const priceAmount = priceMatch ? priceMatch[0].replace(/,(?=\d{3})/g, "") : null;
+
+      const retailEl = document.querySelector(
+        "[data-testid='original-price'], [data-testid='price'] s, [data-testid='price'] del, s.VBDlI, del.VBDlI"
+      );
+      const retailText = retailEl ? compact(retailEl.textContent) : null;
+      const retailMatch = retailText ? retailText.match(/[\d.,]+/) : null;
+      const retailAmount = retailMatch ? retailMatch[0].replace(/,(?=\d{3})/g, "") : null;
 
       const colorEl = document.querySelector("[data-testid='color'], .lystZ1");
       const color = colorEl ? compact(colorEl.textContent) : null;
@@ -573,8 +431,8 @@ const extractDomFallback = async (page) => {
         price: {
           amount: priceAmount,
           formatted: priceText,
-          retailAmount: null,
-          retailFormatted: null,
+          retailAmount,
+          retailFormatted: retailText,
           discountPercent: null,
         },
       };
@@ -855,7 +713,7 @@ export const fetchProductDetails = async (productUrl) => {
             );
           }
 
-          const jsonLdLayer = extractJsonLdLayer(snapshot.html);
+          const jsonLdLayer = extractJsonLdLayer(snapshot.html, productContext.market);
           const domLayer = await extractDomFallback(page);
           const mergedData = mergeProductData(productContext, [jsonLdLayer, domLayer]);
 
