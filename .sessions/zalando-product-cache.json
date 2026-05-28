@@ -1,0 +1,213 @@
+{
+  "1MI22A03D-C11": {
+    "articleId": "1MI22A03D-C11",
+    "title": "PIED DE POULE - Calças - sage",
+    "brand": "Michael Kors",
+    "color": "sage/cinzento-claro",
+    "colors": [
+      "sage/cinzento-claro"
+    ],
+    "sizes": [
+      "48",
+      "50",
+      "52",
+      "58",
+      "A tua conta",
+      "50(Resta apenas 1)",
+      "heart_outlined",
+      "Material e cuidados",
+      "Detalhes",
+      "Ver detalhes de fabrico",
+      "Tamanho e ajuste",
+      "Abrir guia de tamanhos",
+      "Avança para a seleção de produtos",
+      "Retrocede para a seleção de produtos",
+      "Opções de conteúdo",
+      "helpAjuda e contacto",
+      "gift_cardCartão-oferta",
+      "zalando_logo_outlinedSobre nós",
+      "truckOs nossos parceiros",
+      "credit_cardMétodos de pagamento",
+      "shopping_bag_fullO nosso compromisso",
+      "zalando_logo_outlinedOs nossos serviços"
+    ],
+    "variants": [
+      {
+        "sku": "1MI22A03D-C110048000",
+        "size": "48",
+        "color": "sage/cinzento-claro",
+        "price": "149.95",
+        "availability": "http://schema.org/OutOfStock",
+        "url": null
+      },
+      {
+        "sku": "1MI22A03D-C110050000",
+        "size": "50",
+        "color": "sage/cinzento-claro",
+        "price": "149.95",
+        "availability": "http://schema.org/InStock",
+        "url": null
+      },
+      {
+        "sku": "1MI22A03D-C110052000",
+        "size": "52",
+        "color": "sage/cinzento-claro",
+        "price": "149.95",
+        "availability": "http://schema.org/OutOfStock",
+        "url": null
+      },
+      {
+        "sku": "1MI22A03D-C110058000",
+        "size": "58",
+        "color": "sage/cinzento-claro",
+        "price": "149.95",
+        "availability": "http://schema.org/OutOfStock",
+        "url": null
+      }
+    ],
+    "price": {
+      "amount": "149.95",
+      "formatted": null,
+      "retailAmount": null,
+      "retailFormatted": null,
+      "discountPercent": null
+    },
+    "images": [
+      "https://img01.ztat.net/article/spp-media-p1/721e04f99b1845ec8de4a3368a382a23/31df06b13dfb4181a458967d59fd3d92.jpg?imwidth=200",
+      "https://img01.ztat.net/article/spp-media-p1/4a98739ab1f148d69bcb776c30f144cd/407689fc6e0b4e58a5bd731cdf70f698.jpg?imwidth=200",
+      "https://img01.ztat.net/article/spp-media-p1/898eae74402941b3bd7e01907008b236/a0900bdeb824493f93be4d28ac337711.jpg?imwidth=200",
+      "https://img01.ztat.net/article/spp-media-p1/70abcd9b3a574ee786282923a1fbe562/b4a0302703654f23901056724a5acd7c.jpg?imwidth=200",
+      "https://img01.ztat.net/article/spp-media-p1/2d0dc1e95b344573a037110f8b64a66d/ec417fb44aba4477a7206c15464f802b.jpg?imwidth=200",
+      "https://img01.ztat.net/article/spp-media-p1/9ec936c4dbd745c78e336ffaec84125d/4c071aa6662d4d1880ac87a172f192fa.jpg?imwidth=200&filter=packshot",
+      "https://img01.ztat.net/article/spp-media-p1/7f117e0aa8c24e4eb7081c96565dae50/9328c9e560f74e2582f158e7d57cac3f.jpg?imwidth=200"
+    ],
+    "url": "https://www.zalando.pt/michael-kors-pied-de-poule-calcas-sage-1mi22a03d-c11.html",
+    "market": "pt",
+    "sourceChain": [
+      "json-ld",
+      "dom-live"
+    ],
+    "fieldSources": {
+      "title": "json-ld",
+      "brand": "json-ld",
+      "color": "json-ld",
+      "colors": "json-ld",
+      "sizes": "json-ld",
+      "variants": "json-ld",
+      "price": "json-ld",
+      "images": "json-ld"
+    },
+    "cachedAt": "2026-05-28T11:23:17.233Z"
+  },
+  "1MI22A01A-K12": {
+    "articleId": "1MI22A01A-K12",
+    "title": "TRAVEL - Fato - blue",
+    "brand": "Michael Kors",
+    "color": "blue/azul",
+    "colors": [
+      "blue/azul"
+    ],
+    "sizes": [
+      "46",
+      "48",
+      "50",
+      "52",
+      "54",
+      "56",
+      "58"
+    ],
+    "variants": [
+      {
+        "sku": "1MI22A01A-K120046000",
+        "size": "46",
+        "color": "blue/azul",
+        "price": "449.95",
+        "availability": "http://schema.org/OutOfStock",
+        "url": null
+      },
+      {
+        "sku": "1MI22A01A-K120048000",
+        "size": "48",
+        "color": "blue/azul",
+        "price": "449.95",
+        "availability": "http://schema.org/InStock",
+        "url": null
+      },
+      {
+        "sku": "1MI22A01A-K120050000",
+        "size": "50",
+        "color": "blue/azul",
+        "price": "449.95",
+        "availability": "http://schema.org/InStock",
+        "url": null
+      },
+      {
+        "sku": "1MI22A01A-K120052000",
+        "size": "52",
+        "color": "blue/azul",
+        "price": "449.95",
+        "availability": "http://schema.org/OutOfStock",
+        "url": null
+      },
+      {
+        "sku": "1MI22A01A-K120054000",
+        "size": "54",
+        "color": "blue/azul",
+        "price": "449.95",
+        "availability": "http://schema.org/OutOfStock",
+        "url": null
+      },
+      {
+        "sku": "1MI22A01A-K120056000",
+        "size": "56",
+        "color": "blue/azul",
+        "price": "449.95",
+        "availability": "http://schema.org/OutOfStock",
+        "url": null
+      },
+      {
+        "sku": "1MI22A01A-K120058000",
+        "size": "58",
+        "color": "blue/azul",
+        "price": "449.95",
+        "availability": "http://schema.org/OutOfStock",
+        "url": null
+      }
+    ],
+    "price": {
+      "amount": "449.95",
+      "formatted": null,
+      "retailAmount": null,
+      "retailFormatted": null,
+      "discountPercent": null
+    },
+    "images": [
+      "https://img01.ztat.net/article/spp-media-p1/d391d797ef654ab88597dd4fbd65ff59/55ac247ac3ca468b89aeada6efdffe09.jpg?imwidth=200",
+      "https://img01.ztat.net/article/spp-media-p1/fa3f94b48b784bc38eaf82dcfdc82fd6/abca9147caa048c0a074a770cc333199.jpg?imwidth=200",
+      "https://img01.ztat.net/article/spp-media-p1/bd7c2fb941284e908a02e608072c95b6/ea036e69b47246c8963ca5dbfc913d16.jpg?imwidth=200",
+      "https://img01.ztat.net/article/spp-media-p1/35db6e6116e84835ae22cf59d7aa62db/32c0a4f75138491ba37772c2667a1f59.jpg?imwidth=200",
+      "https://img01.ztat.net/article/spp-media-p1/256ba856a3074c1c94233dafcf0cb0fd/7cd7340953244fbbbeb72c31b76d139e.jpg?imwidth=200",
+      "https://img01.ztat.net/article/spp-media-p1/e76617a312e54f98bec47b244608823a/b953639024ab4639834cd0f003683253.jpg?imwidth=200",
+      "https://img01.ztat.net/article/spp-media-p1/9ab775726a58490185480654f791f2d8/461831aae8264fde9c7ac545e78115ab.jpg?imwidth=200",
+      "https://img01.ztat.net/article/spp-media-p1/edf0297ebe3e4ae9805495565a1f43bc/077fec30df3143039c765360af969609.jpg?imwidth=200&filter=packshot",
+      "https://img01.ztat.net/article/spp-media-p1/2e8d003376ca46feaac9b47456a6b762/9044789481c34cde9ece07d150de7cbf.jpg?imwidth=200"
+    ],
+    "url": "https://www.zalando.pt/michael-kors-travel-suit-fato-blue-1mi22a01a-k12.html",
+    "market": "pt",
+    "sourceChain": [
+      "json-ld",
+      "dom-live"
+    ],
+    "fieldSources": {
+      "title": "json-ld",
+      "brand": "json-ld",
+      "color": "json-ld",
+      "colors": "json-ld",
+      "sizes": "json-ld",
+      "variants": "json-ld",
+      "price": "json-ld",
+      "images": "json-ld"
+    },
+    "cachedAt": "2026-05-28T12:06:10.864Z"
+  }
+}
