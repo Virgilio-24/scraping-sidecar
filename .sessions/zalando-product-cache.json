@@ -209,5 +209,140 @@
       "images": "json-ld"
     },
     "cachedAt": "2026-05-28T12:06:10.864Z"
+  },
+  "PI922DA31-A11": {
+    "articleId": "PI922DA31-A11",
+    "title": "Camisa - white",
+    "brand": "Pier One",
+    "color": "white/branco",
+    "colors": [
+      "white/branco"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "3XL",
+      "4XL",
+      "5XL",
+      "6XL"
+    ],
+    "variants": [
+      {
+        "sku": "PI922DA31-A1100XS000",
+        "size": "XS",
+        "color": "white/branco",
+        "price": "23.99",
+        "availability": "http://schema.org/InStock",
+        "url": null
+      },
+      {
+        "sku": "PI922DA31-A11000S000",
+        "size": "S",
+        "color": "white/branco",
+        "price": "23.99",
+        "availability": "http://schema.org/InStock",
+        "url": null
+      },
+      {
+        "sku": "PI922DA31-A11000M000",
+        "size": "M",
+        "color": "white/branco",
+        "price": "23.99",
+        "availability": "http://schema.org/InStock",
+        "url": null
+      },
+      {
+        "sku": "PI922DA31-A11000L000",
+        "size": "L",
+        "color": "white/branco",
+        "price": "23.99",
+        "availability": "http://schema.org/InStock",
+        "url": null
+      },
+      {
+        "sku": "PI922DA31-A1100XL000",
+        "size": "XL",
+        "color": "white/branco",
+        "price": "23.99",
+        "availability": "http://schema.org/InStock",
+        "url": null
+      },
+      {
+        "sku": "PI922DA31-A1102XL000",
+        "size": "XXL",
+        "color": "white/branco",
+        "price": "23.99",
+        "availability": "http://schema.org/InStock",
+        "url": null
+      },
+      {
+        "sku": "PI922DA31-A1103XL000",
+        "size": "3XL",
+        "color": "white/branco",
+        "price": "23.99",
+        "availability": "http://schema.org/OutOfStock",
+        "url": null
+      },
+      {
+        "sku": "PI922DA31-A1104XL000",
+        "size": "4XL",
+        "color": "white/branco",
+        "price": "23.99",
+        "availability": "http://schema.org/OutOfStock",
+        "url": null
+      },
+      {
+        "sku": "PI922DA31-A1105XL000",
+        "size": "5XL",
+        "color": "white/branco",
+        "price": "23.99",
+        "availability": "http://schema.org/OutOfStock",
+        "url": null
+      },
+      {
+        "sku": "PI922DA31-A1106XL000",
+        "size": "6XL",
+        "color": "white/branco",
+        "price": "23.99",
+        "availability": "http://schema.org/InStock",
+        "url": null
+      }
+    ],
+    "price": {
+      "amount": "23.99",
+      "formatted": "23.99 €",
+      "retailAmount": null,
+      "retailFormatted": null,
+      "discountPercent": null
+    },
+    "images": [
+      "https://img01.ztat.net/article/spp-media-p1/2065b978bb7c3aa59a938f4ca7657ace/4bdfe6b069c64d74bae5159dfe89365d.jpg?imwidth=2000",
+      "https://img01.ztat.net/article/spp-media-p1/adaf4959d6b73d4caf0bb51a9b8ef9c6/56df8374c5f64997b2f32d480d31317c.jpg?imwidth=2000",
+      "https://img01.ztat.net/article/spp-media-p1/c634c575445f303b8b61d351398ef0aa/ae98c45622354541a0f114d869f5997c.jpg?imwidth=2000",
+      "https://img01.ztat.net/article/spp-media-p1/49e99ac56aa9379da7d4ca936f5b58c9/c463a2188ec440e9a840e93294b6c1ec.jpg?imwidth=2000",
+      "https://img01.ztat.net/article/spp-media-p1/5b20432d938238b4ad82fa9aec555bff/a286f36fdec44251a1762d2fd478b1cc.jpg?imwidth=2000",
+      "https://img01.ztat.net/article/spp-media-p1/4eafa9b06aa93074ad9d8185e5994557/06407032a12e4c428b535454d49f8d76.jpg?imwidth=2000&filter=packshot"
+    ],
+    "url": "https://www.zalando.pt/pier-one-camisa-formal-white-pi922da31-a11.html",
+    "market": "pt",
+    "sourceChain": [
+      "json-ld",
+      "dom-live"
+    ],
+    "fieldSources": {
+      "title": "json-ld",
+      "brand": "json-ld",
+      "color": "json-ld",
+      "colors": "json-ld",
+      "sizes": "json-ld",
+      "variants": "json-ld",
+      "price": "json-ld",
+      "images": "json-ld"
+    },
+    "cachedAt": "2026-05-28T12:14:44.577Z"
   }
 }
