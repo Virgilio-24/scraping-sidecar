@@ -10,7 +10,8 @@ import {
 } from "./proxy-pool.js";
 
 const RESPONSE_TYPES = {
-  goodsDetail: /\/api\/poppy\/v1\/goods\b/i,
+  goodsDetail: /\/api\/poppy\/v1\/goods/i,
+  seoData: /\/api\/seo\/get_page_seo_data/i,
 };
 
 const HUMAN_CHECK_PATTERNS = [
@@ -187,9 +188,13 @@ const parseProductUrl = (productUrl) => {
     throw error;
   }
 
+  const cleanUrl = pathMatch
+    ? `${parsedUrl.origin}${parsedUrl.pathname}`
+    : `${parsedUrl.origin}/goods.html?goods_id=${goodsId}`;
+
   return {
     goodsId,
-    productUrl: parsedUrl.toString(),
+    productUrl: cleanUrl,
   };
 };
 
@@ -206,6 +211,7 @@ const buildAttempts = () => {
 
 const createResponseBucket = () => ({
   goodsDetail: [],
+  seoData: [],
 });
 
 const resolveResponseType = (url) => {
@@ -933,15 +939,15 @@ const waitForLoginAndReturn = async (page, productUrl) => {
   await navigateToProduct(page, productUrl);
 };
 
-const isHumanCheck = (html, pageTitle) => {
+const isHumanCheck = (bodyText, pageTitle) => {
   return HUMAN_CHECK_PATTERNS.some(
-    (pattern) => pattern.test(html) || pattern.test(pageTitle || "")
+    (pattern) => pattern.test(bodyText) || pattern.test(pageTitle || "")
   );
 };
 
-const isLoginWall = (html, pageTitle) => {
+const isLoginWall = (bodyText, pageTitle) => {
   return LOGIN_WALL_PATTERNS.some(
-    (pattern) => pattern.test(html) || pattern.test(pageTitle || "")
+    (pattern) => pattern.test(bodyText) || pattern.test(pageTitle || "")
   );
 };
 
@@ -1061,29 +1067,38 @@ export const fetchProductDetails = async (productUrl) => {
             await navigateToProduct(page, productContext.productUrl);
             await page.waitForTimeout(config.pageWaitMs);
 
+            try {
+              await page.waitForFunction(
+                () => (document.body?.innerText?.replace(/[​\s]/g, "").length ?? 0) > 50,
+                { timeout: 12000 }
+              );
+            } catch {
+              // SPA did not render visible content in time — proceed anyway
+            }
+
             let snapshot = await readPageSnapshot(page);
 
             if (isOnLoginPage(page.url())) {
               await waitForLoginAndReturn(page, productContext.productUrl);
               await page.waitForTimeout(config.pageWaitMs);
               snapshot = await readPageSnapshot(page);
-            } else if (isLoginWall(snapshot.html, snapshot.pageTitle)) {
+            } else if (isLoginWall(snapshot.bodyText, snapshot.pageTitle)) {
               await tryDismissLoginWall(page);
               snapshot = await readPageSnapshot(page);
 
-              if (isOnLoginPage(page.url()) || isLoginWall(snapshot.html, snapshot.pageTitle)) {
+              if (isOnLoginPage(page.url()) || isLoginWall(snapshot.bodyText, snapshot.pageTitle)) {
                 await waitForLoginAndReturn(page, productContext.productUrl);
                 await page.waitForTimeout(config.pageWaitMs);
                 snapshot = await readPageSnapshot(page);
               }
             }
 
-            if (isHumanCheck(snapshot.html, snapshot.pageTitle)) {
+            if (isHumanCheck(snapshot.bodyText, snapshot.pageTitle)) {
               await waitForHumanVerification(page);
               snapshot = await readPageSnapshot(page);
             }
 
-            if (isHumanCheck(snapshot.html, snapshot.pageTitle)) {
+            if (isHumanCheck(snapshot.bodyText, snapshot.pageTitle)) {
               throw new UpstreamBlockError(
                 "Temu requested human verification (sliding puzzle) before exposing product data."
               );
@@ -1092,6 +1107,7 @@ export const fetchProductDetails = async (productUrl) => {
             const networkData = extractApiData(bucket, productContext);
             const structuredFallback = extractStructuredFallback(snapshot.html);
             const domFallback = await extractDomFallback(page);
+
             const mergedData = mergeProductData(productContext, [
               networkData,
               structuredFallback,
