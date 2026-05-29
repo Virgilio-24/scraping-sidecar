@@ -7,6 +7,7 @@ import {
   getAmazonProduct,
   getZalandoProduct,
   getZaraProduct,
+  getAboutYouProduct,
 } from "../controllers/product.js";
 
 const router = express.Router();
@@ -18,5 +19,6 @@ router.get("/temu/product", getTemuProduct);
 router.get("/amazon/product", getAmazonProduct);
 router.get("/zalando/product", getZalandoProduct);
 router.get("/zara/product", getZaraProduct);
+router.get("/aboutyou/product", getAboutYouProduct);
 
 export default router;
