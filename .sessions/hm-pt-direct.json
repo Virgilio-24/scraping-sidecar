@@ -11,36 +11,6 @@
       "sameSite": "Lax"
     },
     {
-      "name": "AKA_A2",
-      "value": "A",
-      "domain": ".hm.com",
-      "path": "/",
-      "expires": 1780076046.246017,
-      "httpOnly": true,
-      "secure": true,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "bm_ss",
-      "value": "ab8e18ef4e",
-      "domain": ".hm.com",
-      "path": "/",
-      "expires": 1780076051.088864,
-      "httpOnly": true,
-      "secure": true,
-      "sameSite": "None"
-    },
-    {
-      "name": "bm_mi",
-      "value": "90F30B3BEFC8F720CFC99A738B4DDDA5~YAAQfmRkXzXoLm6eAQAA9wuWdB8HsKkAXEbErZ2JB4hYdiZp1XALadntf7x2RZciBWZk7D5OSSHXl64iUk2RibHNM65AvSwJBSz05+3LmQwdzAxN9oISdDH5MF3lA7iW2gADjeWcZZD+ID7AIDZmIvfdBahjWGBBc9sgKAuySxzbgw+5XPouBvPyp5RqUhW0ErxhItbcAQDJhTnplMK5PIHh7FMlth/VSMVzGCOcB8jz33RQzEv+kpxAPbH2F3gIkia0By/JX8zxe75siwWrHdnKQVFsAPL27JIUfJkUZJ9/+y4ZWPmP9p/U2+VREc1R11qkXfl0w6XZwJc62taSa6C16ajmnAOM~1",
-      "domain": ".hm.com",
-      "path": "/",
-      "expires": 1780079648.088923,
-      "httpOnly": false,
-      "secure": true,
-      "sameSite": "Lax"
-    },
-    {
       "name": "agCookie",
       "value": "28052267-3cf1-40ef-bd71-f133bfda1d92",
       "domain": "www2.hm.com",
@@ -61,61 +31,61 @@
       "sameSite": "None"
     },
     {
-      "name": "JSESSIONID",
-      "value": "AE5C9D263A85B8392D33B53A96057F54697CD69192F47BCCC7AAC11975771FD0B49CA0D15219DD3CEE72406E7347B603948AC2F137FE2B89D1AB35B98A8696B5.hybris-ecm-web-7498f44bf4-dpbxx",
-      "domain": "www2.hm.com",
-      "path": "/",
-      "expires": -1,
-      "httpOnly": true,
-      "secure": true,
-      "sameSite": "None"
-    },
-    {
-      "name": "userCookie",
-      "value": "##eyJjYXJ0Q291bnQiOjB9##",
-      "domain": "www2.hm.com",
-      "path": "/",
-      "expires": -1,
-      "httpOnly": false,
-      "secure": true,
-      "sameSite": "None"
-    },
-    {
-      "name": "ak_bmsc",
-      "value": "3435FCFB2E7DAE7DB20A66A32FC6FD38~000000000000000000000000000000~YAAQfmRkX4ACL26eAQAA71OWdB/qRN5DSl2W4cSOz8Ce7GwNmQ8FJ3Z8P6IJVD+YpO/u5PMHyZMuYBZ9uYb0d3iRi93DfCsYz1aeUd5Z4WvhIAtvLfc1gv/sLyTb/zmaz/kywcpdgM/QIRyOdhYkKZH02FcBZ70XLIynMyyWobWCpzCd5cn4t3sq9c/9nCtdTltYGkYSB9dRW1AEvyIZckmFQJ/NbptcmCTlzduIRitgikDJJ1HZAWoJky88ARzFPc1+D9FM5qZCD19pZvo3KAG8bFdh2dJjK9d7BXNtGQ0Mu9lz+GK1AVCAmYcFYW0WcSMwQtShaRqrzTtH3Xk/0h9STWc92DPV0w/7ZwHb2QLQAD7GjpkEGWcQgrI4q2JKqENU9bp1Pmqok3vw1dTRxUjS304R2kAWY3i4Xvrc962l7/4obSPhHRz88UEWdIiDkyU07w0lsgtLikjmdpW2C7doJneadWG9VTX+R+OAyFP5DGW2xQfiur/pOcAWmgKsasdqDIe4/HBu",
+      "name": "AKA_A2",
+      "value": "A",
       "domain": ".hm.com",
       "path": "/",
-      "expires": 1780079647.548508,
+      "expires": 1780328068.717331,
       "httpOnly": true,
-      "secure": false,
+      "secure": true,
       "sameSite": "Lax"
     },
     {
+      "name": "JSESSIONID",
+      "value": "31F181AEAAE7A56D76CCDE3E852261DEEB16731A756CB7C495DDF8B81D463D53B43B03D1EA25B26425A515FC278CD7B63278F7D671172E0111C56F3FF90D532A.hybris-ecm-web-7498f44bf4-dpbxx",
+      "domain": "www2.hm.com",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
       "name": "utag_main__sn",
-      "value": "1",
+      "value": "2",
       "domain": ".hm.com",
       "path": "/",
-      "expires": 1811609194,
+      "expires": 1811860471,
       "httpOnly": false,
       "secure": true,
       "sameSite": "Lax"
     },
     {
       "name": "utag_main_ses_id",
-      "value": "1780072510586%3Bexp-session",
+      "value": "1780324470911%3Bexp-session",
       "domain": ".hm.com",
       "path": "/",
-      "expires": 1780074994,
+      "expires": 1780326271,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "utag_main__pn",
+      "value": "1%3Bexp-session",
+      "domain": ".hm.com",
+      "path": "/",
+      "expires": 1780326271,
       "httpOnly": false,
       "secure": true,
       "sameSite": "Lax"
     },
     {
       "name": "dep_sid",
-      "value": "s_9981797458647333.1780072510612",
+      "value": "s_2546148927342913.1780324470936",
       "domain": ".hm.com",
       "path": "/",
-      "expires": 1780074994,
+      "expires": 1780326271,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Lax"
@@ -125,7 +95,7 @@
       "value": "normal",
       "domain": ".hm.com",
       "path": "/",
-      "expires": 1780074310,
+      "expires": 1780326270,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Lax"
@@ -135,64 +105,104 @@
       "value": "0%3Bexp-session",
       "domain": ".hm.com",
       "path": "/",
-      "expires": 1780074994,
+      "expires": 1780326271,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "dep_exp",
+      "value": "Mon, 01 Jun 2026 15:04:31 GMT",
+      "domain": ".hm.com",
+      "path": "/",
+      "expires": 1780326271,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "utag_main__se",
+      "value": "5%3Bexp-session",
+      "domain": ".hm.com",
+      "path": "/",
+      "expires": 1780326271,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "utag_main__st",
+      "value": "1780326271056%3Bexp-session",
+      "domain": ".hm.com",
+      "path": "/",
+      "expires": 1780326271,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "bm_ss",
+      "value": "ab8e18ef4e",
+      "domain": ".hm.com",
+      "path": "/",
+      "expires": 1780328072.596993,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "bm_mi",
+      "value": "EB6934D29BC6A751FC931FE86B5F4F9A~YAAQBTYTAqSjm3eeAQAACJebgwAQnod9BlPNYcQdcwycNrJMypDTchHFn70B1/KP1SRtcvhNeTcO7rYLc2KmDVUeLslVRkLigkiTLTYaN9nBRhitdHHeE4rfBrRkVgm0wu2o69/Ar/gNYxfvSAmaR0LFcgdCZH49zTwvUSD8utP/3qk9Cb2H9P7wus33S2larGE3LqNkepFNHJkv9N+XnvOjfXdOWqKVEnE2ftJEPqEFtWIVlLulwrc8PVBPU7uvsgm9R/33R/O1n8xWZEFnTdJ/btWtAWLpSTVUajy6EyHBig6Y9K5WSUZ8mw63Xtv0OW510nzIhQsF~1",
+      "domain": ".hm.com",
+      "path": "/",
+      "expires": 1780331669.597089,
       "httpOnly": false,
       "secure": true,
       "sameSite": "Lax"
     },
     {
       "name": "bm_so",
-      "value": "B2F05916C24BB24FB7ED06AF8B156EE4242E08D40D3697B2D92C7B00E117C7C0~YAAQ0G1lX2u7IXSeAQAA8BWhdAeq42IREsptrN22vo5+KkZkOb1jRkBiERst62rTG0Z1gji8ftSnDR75TSmZmVTwj/t6d/m/R3UaNXsEbKaL0iVWn/ObY4CCCJihIeCcLkoI4nRuuYW3CXSZ6sgRozGtOc/tRoDBBV7/Ccm7NJ3s5YCdj7gKM8eGyBybRQ62sEuRtQrjKLTCbFRNLEi8FpasFe8uc9ndx8ABxVk3XNYB0c9pVAhuay4QNHmLebbpvvTAA7RvpEgLIjbsV+Sjuq9eGotGk3ZMb7MJpA3rLL4h1VWDvlmUN89JVLLUVQLqORqcZNNVc+HkUHcI7axyTnkMJplEzxeGECDvqGR3OStbyHP19vZyQDfr9xk8KPz0qoMM51sbLhrczLOCk7Hdccz+9RfAUXtI1ZLgpLl7GSmgaqs4L0C+5TkSLxQ0EGVcyenHTuWYose7jBRm",
+      "value": "20374D71D2659EC78ED73014EA1AB1B0435F96714C657B31E44CE4D1F3F16292~YAAQBTYTAqejm3eeAQAACJebgwc9ZrNeY2Ljaibb+YRZ5JKQ/Irjuf70fT2Z9IIbnTzjG0sqQJQnHiRHXANAG7OglbmuV4C7yQZKsaKQOxq7QHaKx1K8irQ+EYD1lduHAUGYgWzVp0w6LXrLqb5bV1z2LUBQEYgsalWlE6atrElJnoPEAreYxaIL4vpUKxcor2jsn8fy3iwe41mq8FBxOGAOpfX7/oWdOBO6aAnJHIn8+i723nAB2R8GPUUQ8apA7Rw9K2Vd0JrVSi1imsaMWF0D3yV6DgBna8Y4S4NwbdnIU5UYc8/AdANLZ44y758yz3yiAHHZzH3g7bIo7+3mRDDVfiA8a5sZS8QtT/CPorTe5yZNronXjfd3BvibxZRiMR6vymwH3cmO+5hiP2kHOKl6UAaXoK3uVEgXoXVez7NmF2XOgI5oJLynqi5NUnFSnJxifisisl+zAAPM",
       "domain": ".hm.com",
       "path": "/",
-      "expires": 1780159574.54175,
+      "expires": 1780410872.597219,
       "httpOnly": false,
       "secure": true,
       "sameSite": "Lax"
     },
     {
-      "name": "bm_sz",
-      "value": "12B6E1E40F5911B84E769C239EA5EE3E~YAAQ0G1lX8vMIXSeAQAA5i2hdB+FF0jcSKdKw9NByBysxJWqPGHklACcMxWXo/swrjP8vFR5CaUVC3c7inX7S0mN4N/hykwwrlNe94VjN1KT7gALEeOtSfTxpYQ9n4+c0XCMPj+c30V0kP9sTQMt+LXZr05pvnZt4O7NbFQ2buvEWq9X6bqUsWc8pKmwYey1aD7JgffJQjuJqOGVWZP6crKqaNidI1M68dK8Onnh0yGU/1DS+DcyWURuRdDtO0nCrHUmkhRc/SY/F2d+bjsVe1dQZ9y/UfvjD0mwpr7KG8bO+FiseurVkgh1U1znlTwJIAE22C1pPiRoOGstXyLnDRrcx+6sK90KLtFIZ5TrNCSI/XkYXpKn8YorwtbYej/ECgcGWu0FhxyCQl8TnLjm2mtSwFkDjs0/d8BUUfr8Gi7PqBsxwPX3ZZQlr2dKwTcyxgQzBF03Co+P6g==~3617593~3356485",
+      "name": "RT",
+      "value": "\"z=1&dm=hm.com&si=4f4b28c8-2922-47d7-8fb9-6fae60bb3556&ss=mpvb7zou&sl=1&tt=1ve&bcn=%2F%2F02179918.akstat.io%2F&ld=2rw&hd=33g\"",
       "domain": ".hm.com",
       "path": "/",
-      "expires": 1780086846.680824,
+      "expires": 1780929272,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Lax"
     },
     {
-      "name": "utag_main__pn",
-      "value": "3%3Bexp-session",
-      "domain": ".hm.com",
+      "name": "bm_lso",
+      "value": "20374D71D2659EC78ED73014EA1AB1B0435F96714C657B31E44CE4D1F3F16292~YAAQBTYTAqejm3eeAQAACJebgwc9ZrNeY2Ljaibb+YRZ5JKQ/Irjuf70fT2Z9IIbnTzjG0sqQJQnHiRHXANAG7OglbmuV4C7yQZKsaKQOxq7QHaKx1K8irQ+EYD1lduHAUGYgWzVp0w6LXrLqb5bV1z2LUBQEYgsalWlE6atrElJnoPEAreYxaIL4vpUKxcor2jsn8fy3iwe41mq8FBxOGAOpfX7/oWdOBO6aAnJHIn8+i723nAB2R8GPUUQ8apA7Rw9K2Vd0JrVSi1imsaMWF0D3yV6DgBna8Y4S4NwbdnIU5UYc8/AdANLZ44y758yz3yiAHHZzH3g7bIo7+3mRDDVfiA8a5sZS8QtT/CPorTe5yZNronXjfd3BvibxZRiMR6vymwH3cmO+5hiP2kHOKl6UAaXoK3uVEgXoXVez7NmF2XOgI5oJLynqi5NUnFSnJxifisisl+zAAPM~1780324472961",
+      "domain": ".www2.hm.com",
       "path": "/",
-      "expires": 1780074994,
-      "httpOnly": false,
-      "secure": true,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "bm_s",
-      "value": "YAAQ0G1lX8PyIXSeAQAA+F6hdAXrihOefrtmXflnjh1k4TnF2UrruL5Vo8DopoivnW6AX9bWe6Dix+vYWKqvrtEP4uN9fvnSDmhh60oqdY1flrrRNHWtvPVm94OtfUgWmmkcMsAmtkR4KS9TYM5xDRRR8P4vwkaYewW9nANh9yqw4d0sUnlpz43H9oTtRUKCh0hStyFTVhBbjdxyiBROfc4SlPjdAsd1/avTTDflGmpHO7x104bZG6h3E6iQUr7OjA/1CKtdT5u4gvBwLcIa0qyvULueqx4j5bYYXUm1EHfHduvarFZIplV78HHRj7q0C1CUjD2Y8YU3cTdtI5lqgX6pOpuu7jbJeiK8G/jjJ2dInG6gdo9YKR9/d7cXtOUYyKfEProRA5bEnY8SJ/Na7WguWxTpx4KOUOzWzxA9dgNF6t9uviETkVWus4yOvFfORyxqC9mPj5b02z5w2rZWL2x8waKfsp51V9anepgM2JJ3k5cooFv3NClxSfnQ8FSfhNTCMt4e3KKV/vwYgIYjKjlu0A4XbkisPjewVYWNucLx+c2I3eqF0U/JhM/AXrzy5WoRKNJ/sHn1Mp0vLjhVC2z/lOnL5LXLnkExTz0Anz1aN0vpWkRRhB6Vg0MfddwbimuBUVQ7q5Iccov1TyiT4RFGbquRTD7g57Nh0qt75A7CPGxnByAqlobWfdPQNlJgIW0Qq79Im22eJLczbuYSsZ/vbzEyb/JJe4+uMvDypRpCVPQyMzG/5df0PGtO4LyZCwrgVs+goPZPPg==",
-      "domain": ".hm.com",
-      "path": "/",
-      "expires": 1782751593.246764,
-      "httpOnly": true,
-      "secure": true,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "dep_exp",
-      "value": "Fri, 29 May 2026 17:16:34 GMT",
-      "domain": ".hm.com",
-      "path": "/",
-      "expires": 1780074994,
+      "expires": 1782916472,
       "httpOnly": false,
       "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_abck",
+      "value": "ED011C8B4116AFD9F34733D06D6E8F2D~-1~YAAQBTYTAgikm3eeAQAA+pmbgw9mett/t4vm9CmL4iwSAxxuBpgRnTfvNqExTC4dL36ILyE3C3lITFWdBdxjPlo0/AX+meGPupqi6alcN0zaylBfMy3JJ3u4ZCzOVNuoNmNNiZNQaER4fafhik08LYiMKFJ+TLvyGAoS4kXE+dt/Dfs2pmEfpQufmDQyQJfgpQLYM4X9I/bxZAZY7zp9ttMLnSv0Td7af3NETG6WuU/vUJ94pjHTzjYkhoq0n2SVBz0cnZSu9jrPn5QQFMC/C2BKy43BfiMJiLV6VbpbwsVec+38B/KbUOa6WnQBtS/lOAR9qun7slvthVjJqHnYtD/QqqswDDlThSBoYYCL71CqgHx7E3eHQkE4rNvBH0hCfCQmKF13im2rQgirvfEwB3hA8cBA/sIGBuvxsKsTNb8KAwaDdnarhkUKX49WwNlD4UjdQWZ+TxYeUz3mj/cpeVRBdy6A8xFAs6p4Y/Pac2jF9NXpdRatRzj4ZxtAWjpbZmODvRN0KX2zMrCfynq/pcWiIsdKvldkjZf5JmxslsuspCoXXqF1kHZAiafciOc/fxsl0mqOyeVn2VUWI7CNsp4MpMmaNKEiuzux9dZ3TxSnQalYZ+lk56n69+CiZo0EEfuWazYM29dvGVlGyw==~-1~-1~1780328069~AAQAAAAF%2f%2f%2f%2f%2f%2fRhIQc8z2DJuiUZ6MPaSwr0+HjJuqfnLf%2fSYWS5YNeB%2fQ0l9T2NDYbyw1G8b8wgL0k2gI%2feI1n4JBtbDrlRXjTQG+vMbGxSMuYx~-1",
+      "domain": ".hm.com",
+      "path": "/",
+      "expires": 1811860473.349625,
+      "httpOnly": false,
+      "secure": true,
       "sameSite": "Lax"
     },
     {
       "name": "akamref",
-      "value": "",
+      "value": "pt_pt",
       "domain": ".www2.hm.com",
       "path": "/",
       "expires": -1,
@@ -201,8 +211,48 @@
       "sameSite": "Lax"
     },
     {
+      "name": "ak_bmsc",
+      "value": "95E10ED510D98BB59A8FB3C628BDD6B4~000000000000000000000000000000~YAAQBTYTAvqkm3eeAQAAIp+bgwCyt9uBCFNzRx1s6AZQwIDu/TmSqotHBmgO+GWQdWX1KwHM/5Qoe+KX6lI6Q9yr6ronjFhWhx2fYqQrYsBGcDms9CvVLhgRawxevfY/0gmOTlBwpHoYzgqxHIvjpb7Tx+mJoaCNl7WEV9DPvcCduaNOkq+iaU4MNhyYkX82jVB3q461GlZg1Q18MvcW9mNh9V8nB60aAZcsWREJQHriDMVVWsNvQ8KY6oYRXc6Xv0pPE8JAS3HCQ8oVz1dndfsP9fDZJoYAOZgtALfP89mmiKKTPjYtIA2fngSbxKEpGxxPSrhSb2Qi48FvsWb/Y8xQA3pYj9kx6KH5BFFXpHLXlNHj/Era74lDPLt5AfMKpGod5/NKape1gEQK9LCJkgY=",
+      "domain": ".hm.com",
+      "path": "/",
+      "expires": 1780331669.672361,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "bm_sc",
+      "value": "3~1~294821569~YAAQBTYTAvykm3eeAQAAIp+bgwie7G977tiHgjo5gsFeRU7C58G3p9w/gizKhCORrjiwwSdN/dJZxT2mnX0KVAhMqLyL+hyLPe4yOY/HOBz7MZJLXQyVpk9q7bf1AJ8wIw3oT7ZkkMN69+l2g0Stn2NguKBGFYHzbHkbgV7IV91HnSsJxyyLNHqX8eVTew4cPod0kAhdr/OFAIt55JmNdQVyhVw30cy7KTIUe89Z5SyATBZnX8AoIpxDuTDxv8onhkWu3m4lyuE1W2whioBTmMZxZ/hF/6lgqv4VOD8Fi7T/kI3oLL7Mi4dC+0HnPVVoIywH7WSKZDTwwwQ60ywkMEGdai50bVzmS+XToPYXlXnPOvM2h9tauAcL6WzRfMKmYx5r/NoNrkz6LY/7Hzp4cpyDIwzbvK19VBY6+BjGPffll8ctzy97Hm7AfU3qqNhYbPU6dHL6XLH+JSQ/crkcA5B15rJKgSUBBngnhwLhDnx4CxotRal6rpVObEOqZG9UCLurPk9xsLShnYWZjlNirLQY4tmzWw==~0~0~0",
+      "domain": ".hm.com",
+      "path": "/",
+      "expires": 1780325132.672872,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "bm_sv",
+      "value": "824BB616914BD528C87DD0C9307F470C~YAAQBTYTAnGum3eeAQAAtNabgwAkg4yIbnqb9E3WhiU4KaFfMF58flXIl+MtO2zgjlllT7/tztEKONZvqbNBl4uadHoHZRXuprujZkv/WUtPAs4PaFVhOp9HqGRDgPD5yKYe82E0Et4S48rWBmGtJEqNrNMdZE8HZ9ZW/0+8UB4fJfgUnCzqrKmR0CbKB3B9NVk5Kk9f81A3Xwp6kiiaqMTjYeJ/L/C1vvGKtx57g4RLRSwLCNFdSM5pKFE=~1",
+      "domain": ".hm.com",
+      "path": "/",
+      "expires": 1780331672.901823,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "bm_sz",
+      "value": "2586C390FB61A9BA1ED53031C88FEA8E~YAAQBTYTAnKum3eeAQAAtNabgwCULSKLtzD8MlynAUdJs38YL9N7z56DukNa+buIqLla1WQLuVHxk4jSm0D/wUrrgzNr73osLQsFVfaOP1dVffz8VaWTYNReBZkH/OQC2buJb8vG3wPAu3JAwEJQRIWs4U5qwd+5Av+uQV5hWSI8sWDpvXFPIlUWxPZyj5OYKdKP83j/jfpyHI36IZZShfpto3Gevyn9aEdw/CWKU3/koy2ApWhVANQbge2HRZ0AZdGD80UYhvpS/Ikv2tip1EQbvH/dUCP2NynQhSIEcg1/vtrbAXZ9oiR20r7ylSstiMxvBCjl+B2HhDmYB3xH4FldO3ZV/cbBuI0I5urmHYdDfvqadaCXyKLzNg2dlVkDOhtJAaAN/xULv9b4f9GzXInZOkirPcgLNsZIyY0=~4337718~3424564",
+      "domain": ".hm.com",
+      "path": "/",
+      "expires": 1780338868.901866,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
       "name": "akavpau_www2_pt_pt",
-      "value": "1780073494~id=24204a5e0ab8256ca88b95b454a9f94f",
+      "value": "1780324791~id=a0de6cdabe37f85a5f1472007e42ee97",
       "domain": "www2.hm.com",
       "path": "/",
       "expires": -1,
@@ -211,62 +261,12 @@
       "sameSite": "None"
     },
     {
-      "name": "bm_sv",
-      "value": "BACB6086C76A3AB6460D4FDCA359F3BB~YAAQ0G1lX4T2IXSeAQAAUWOhdB9t5n8psGwrbOLisOy/Kyuwm8rNoIMDkwlefScQRI1fSLZGEGmjgxQNLA7js19+wn6/gC/xZ/B05f0Mb/e9Vc4f6dAW3QWozzJkS8OuHHnj7rPTX4pvvqQMsovawnP3yTVuMOkvPbVYazzkW0FsSXyBXvPyUkPYjFAOBBOQcT9yUsIM1FzXugW/3ek1TihBCQcI6Y8nBmziDOo0FQ+fs2FJypKMLh03E6lf~1",
+      "name": "bm_s",
+      "value": "YAAQBTYTAg2wm3eeAQAAgeGbgwVPPYev0WhowOaEZOmEbwOp5+Is5rt371HbQfUk5NHF3WLrR+juTHLwuZItdoJmcUVLscIPSigTOw/Cq31HD/z4JWxlAa8AvTSgCeNqKOTKlA66HzJgWXgua7gnFLZeTrOxd7w5BRglTc8ziCFXInjI+gxpVXW4NcbwWbzWQU5huMX8wscedGow1tbs5AdEoAt7WYbaZfuRdpnjG6L2ffnu51QH6mhyVRG8BFrr8mHTg1t8HKoMPCa7M/0/yeLsROxzQadr/UDMwMt1OJlx1IoHUiVM2dxLA0nq6vsld2P9aADDoXhg7KIid+nT3dFJB+rdcNwcxeSyBDE+Tgy1g7xQ7R+xdqGADZ9gaRXC8HbblcbZhnADbuZGKmRm8lrb3fWxqitONkQ9YP5BoinpIlbUQERICWYbxfIl5EvI9oRFoVY6fJcELNYr0qpEaQJGPhvIlsacxGP3CrA+7A+rbHV2zpJG1Q3pCLTOUTfeyuZnnZnOlO4QZRAWf3rKIFPnFI+wYimI5KrsSjyGgqdwFIwG/6XZBnzsexelUvLblAkyPjQQXNMbVe5KLcE9n9I1wjthC8vBVk0KRPB7rQOGaK2Fqse6R2bkG93dDlR1oA/rwibrlxLZC3iVt/9uC9qL56dlYOZnqpAoh2u4ZvW/zuYiFktucs+Tp4QethZq6zl2kADAPCJG4GgIG7SqDv753pD0iqT/cLFjVA8xRHYj0FCjV9BcYeuLCPoPqNK7IEPE6nUQco7hZg==",
       "domain": ".hm.com",
       "path": "/",
-      "expires": 1780079651.344507,
-      "httpOnly": false,
-      "secure": true,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "RT",
-      "value": "\"z=1&dm=hm.com&si=4f4b28c8-2922-47d7-8fb9-6fae60bb3556&ss=mpr56dib&sl=3&tt=bev&bcn=%2F%2F0217991a.akstat.io%2F&obo=2&ld=fxvx\"",
-      "domain": ".hm.com",
-      "path": "/",
-      "expires": 1780677994,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "utag_main__se",
-      "value": "19%3Bexp-session",
-      "domain": ".hm.com",
-      "path": "/",
-      "expires": 1780074994,
-      "httpOnly": false,
-      "secure": true,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "utag_main__st",
-      "value": "1780074994873%3Bexp-session",
-      "domain": ".hm.com",
-      "path": "/",
-      "expires": 1780074994,
-      "httpOnly": false,
-      "secure": true,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "bm_lso",
-      "value": "B2F05916C24BB24FB7ED06AF8B156EE4242E08D40D3697B2D92C7B00E117C7C0~YAAQ0G1lX2u7IXSeAQAA8BWhdAeq42IREsptrN22vo5+KkZkOb1jRkBiERst62rTG0Z1gji8ftSnDR75TSmZmVTwj/t6d/m/R3UaNXsEbKaL0iVWn/ObY4CCCJihIeCcLkoI4nRuuYW3CXSZ6sgRozGtOc/tRoDBBV7/Ccm7NJ3s5YCdj7gKM8eGyBybRQ62sEuRtQrjKLTCbFRNLEi8FpasFe8uc9ndx8ABxVk3XNYB0c9pVAhuay4QNHmLebbpvvTAA7RvpEgLIjbsV+Sjuq9eGotGk3ZMb7MJpA3rLL4h1VWDvlmUN89JVLLUVQLqORqcZNNVc+HkUHcI7axyTnkMJplEzxeGECDvqGR3OStbyHP19vZyQDfr9xk8KPz0qoMM51sbLhrczLOCk7Hdccz+9RfAUXtI1ZLgpLl7GSmgaqs4L0C+5TkSLxQ0EGVcyenHTuWYose7jBRm~1780073194911",
-      "domain": ".www2.hm.com",
-      "path": "/",
-      "expires": 1782665194,
-      "httpOnly": false,
-      "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "_abck",
-      "value": "ED011C8B4116AFD9F34733D06D6E8F2D~-1~YAAQ0G1lX0f5IXSeAQAAIGehdA+J9neIwUxbrNPUsENmnvwBKkbW32pndZWxJGspuUCo58JkKWhYtb8A4U6RqS0EsdviIWO47kJanm4+IpN68LYLA0f1pKN150QB10Eu1jLZBZChvbW5O4VMMz1ZZLuV2NQf1WKSUXMKLede92tO/mv1alRT1AnjsuF9jpZSHjITZsv3urv/XLoBijDtW95n4riLXKag14MBSt20Eg5rSftpY7SxjUtqmfq1dNdYXd27Tnm+amFwkVxRZf+vrh45jNmwVrmK5QHnASoOHT1tfL4spR2VvfIFP8uB1vCLhZZhU0lH27lRXHyyXkdHUcMDrynEEjP6EKHBYdJFrajIG7CrJfBG+l8+96vD2jt/o45RPOKxR2+o4c6Kqd1CXWb9a4JOtLxbW9Vk/V6fOPOEVrmVj0BxmZksHxVQUPNUuicawf95YbXaccoJlwzDRzKjax0/RErBauFuUhivlGv8ISM2yZqxRvKhsiWbJ01sOVL0jGImLS2PK5ZIm6aJI/ZqDX0o3a/mKygkOxcrldIrI/UnkDQCW4QZhWacBQK/TRF8oxvyu6CF8PEVwIkbptYzkL+hpimPtr9lEvFDg6izRDcYtGOU71PnO5WJVAF7QWKYcmp+bqlDGtiir4JSvvjDB2cf4ZXmSbDYls5fiCPB0jCC4Icr~-1~-1~1780076047~AAQAAAAF%2f%2f%2f%2f%2f3KeBlmiX9n1rQkvXBZ2klJ9hDlkWKbCuSjvArGCKGE%2fqiFrrs5YwfCx0D03IhbYgOOFsVig7ZmiMgrGY86A1P4HZw0LocwDmYz+kL0x%2fJ3qKKilNcLnQ8K6k0dGm15lLtUOYCw%3d~-1",
-      "domain": ".hm.com",
-      "path": "/",
-      "expires": 1811609195.355661,
-      "httpOnly": false,
+      "expires": 1783002891.664306,
+      "httpOnly": true,
       "secure": true,
       "sameSite": "Lax"
     }
@@ -275,22 +275,6 @@
     {
       "origin": "https://www2.hm.com",
       "localStorage": [
-        {
-          "name": "fabulousVisitorID_expiration",
-          "value": "2027-05-29T16:46:21.558Z"
-        },
-        {
-          "name": "lastAvailabilityFetchTime",
-          "value": "1780073192216"
-        },
-        {
-          "name": "theme-preference",
-          "value": "theme-light"
-        },
-        {
-          "name": "tiqStore",
-          "value": "{\"fABulous\":{\"value\":[{\"experimentId\":\"4083\",\"variationId\":\"1\",\"expire\":1782665194707},{\"experimentId\":\"22681\",\"variationId\":\"1\",\"expire\":1782665194731},{\"experimentId\":\"12703\",\"variationId\":\"1\",\"expire\":1782665194747},{\"experimentId\":\"14123\",\"variationId\":\"1\",\"expire\":1782665194757},{\"experimentId\":\"13322\",\"variationId\":\"1\",\"expire\":1782665194771},{\"experimentId\":\"19156\",\"variationId\":\"1\",\"expire\":1782665194779},{\"experimentId\":\"18216\",\"variationId\":\"1\",\"expire\":1782665194796},{\"experimentId\":\"19481\",\"variationId\":\"1\",\"expire\":1782665194809},{\"experimentId\":\"22260\",\"variationId\":\"2\",\"expire\":1782665194825},{\"experimentId\":\"22114\",\"variationId\":\"1\",\"expire\":1782665194836},{\"experimentId\":\"17768\",\"variationId\":\"1\",\"expire\":1782665194844},{\"experimentId\":\"10547\",\"variationId\":\"1\",\"expire\":1782665194855},{\"experimentId\":\"21697\",\"variationId\":\"1\",\"expire\":1782665194864},{\"experimentId\":\"12881\",\"variationId\":\"1\",\"expire\":1782665194875}],\"expire\":1811609194878}}"
-        },
         {
           "name": "ak_a",
           "value": "ED011C8B4116AFD9F34733D06D6E8F2D"
@@ -302,6 +286,22 @@
         {
           "name": "ak_ax",
           "value": "-1"
+        },
+        {
+          "name": "fabulousVisitorID_expiration",
+          "value": "2027-06-01T14:34:29.583Z"
+        },
+        {
+          "name": "lastAvailabilityFetchTime",
+          "value": "1780073192216"
+        },
+        {
+          "name": "theme-preference",
+          "value": "theme-light"
+        },
+        {
+          "name": "tiqStore",
+          "value": "{\"fABulous\":{\"value\":[{\"experimentId\":\"4083\",\"variationId\":\"1\",\"expire\":1782665194707},{\"experimentId\":\"14123\",\"variationId\":\"1\",\"expire\":1782665194757},{\"experimentId\":\"13322\",\"variationId\":\"1\",\"expire\":1782665194771},{\"experimentId\":\"19156\",\"variationId\":\"1\",\"expire\":1782665194779},{\"experimentId\":\"18216\",\"variationId\":\"1\",\"expire\":1782665194796},{\"experimentId\":\"19481\",\"variationId\":\"1\",\"expire\":1782665194809},{\"experimentId\":\"22260\",\"variationId\":\"2\",\"expire\":1782665194825},{\"experimentId\":\"22114\",\"variationId\":\"1\",\"expire\":1782665194836},{\"experimentId\":\"17768\",\"variationId\":\"1\",\"expire\":1782665194844},{\"experimentId\":\"10547\",\"variationId\":\"1\",\"expire\":1782665194855},{\"experimentId\":\"21697\",\"variationId\":\"1\",\"expire\":1782665194864},{\"experimentId\":\"12881\",\"variationId\":\"1\",\"expire\":1782665194875},{\"experimentId\":\"22681\",\"variationId\":\"1\",\"expire\":1782916471024},{\"experimentId\":\"12703\",\"variationId\":\"1\",\"expire\":1782916471032},{\"experimentId\":\"8516\",\"variationId\":\"1\",\"expire\":1782916471057}],\"expire\":1811860471059}}"
         }
       ]
     }
