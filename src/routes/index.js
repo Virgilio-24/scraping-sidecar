@@ -9,6 +9,8 @@ import {
   getZaraProduct,
   getAboutYouProduct,
   getHmProduct,
+  getPullAndBearProduct,
+  getBershkaProduct,
 } from "../controllers/product.js";
 
 const router = express.Router();
@@ -22,5 +24,7 @@ router.get("/zalando/product", getZalandoProduct);
 router.get("/zara/product", getZaraProduct);
 router.get("/aboutyou/product", getAboutYouProduct);
 router.get("/hm/product", getHmProduct);
+router.get("/pullandbear/product", getPullAndBearProduct);
+router.get("/bershka/product", getBershkaProduct);
 
 export default router;
