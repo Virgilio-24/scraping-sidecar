@@ -11,6 +11,7 @@ import {
   getHmProduct,
   getPullAndBearProduct,
   getBershkaProduct,
+  getAutoProduct,
 } from "../controllers/product.js";
 
 const router = express.Router();
@@ -26,5 +27,6 @@ router.get("/aboutyou/product", getAboutYouProduct);
 router.get("/hm/product", getHmProduct);
 router.get("/pullandbear/product", getPullAndBearProduct);
 router.get("/bershka/product", getBershkaProduct);
+router.get("/product/auto", getAutoProduct);
 
 export default router;
