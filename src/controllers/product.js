@@ -32,6 +32,7 @@ import {
   UpstreamBlockError as BershkaUpstreamBlockError,
   fetchProductDetails as fetchBershkaProductDetails,
 } from "../services/bershka.js";
+import { detectBrand, SUPPORTED_BRANDS } from "../services/brand-router.js";
 
 export const getHealth = (req, res) => {
   res.status(200).json({ status: "ok" });
@@ -382,6 +383,63 @@ const makeInditexHandler = (fetchFn, BlockError) => async (req, res) => {
 };
 
 export const getPullAndBearProduct = makeInditexHandler(fetchPullAndBearProductDetails, PullAndBearUpstreamBlockError);
+
+const LANG_TO_AMAZON_PARAM = {
+  pt: "pt_PT", en: "en_GB", es: "es_ES", de: "de_DE", fr: "fr_FR", it: "it_IT",
+};
+
+const applyLangToUrl = (brand, url, lang) => {
+  if (brand !== "amazon" || !lang) return url;
+  const code = LANG_TO_AMAZON_PARAM[lang.toLowerCase()];
+  if (!code) return url;
+  try {
+    const parsed = new URL(url);
+    // Prefer /-/lang/ prefix over query param when possible
+    if (!parsed.pathname.includes("/-/")) {
+      parsed.pathname = `/-/${lang.toLowerCase()}${parsed.pathname}`;
+    }
+    return parsed.toString();
+  } catch {
+    return url;
+  }
+};
+
+export const getAutoProduct = async (req, res) => {
+  const { url, lang } = req.query;
+
+  if (!url) {
+    return res.status(400).json({ status: "error", message: "Query string 'url' is required." });
+  }
+
+  const entry = detectBrand(url);
+
+  if (!entry) {
+    return res.status(400).json({
+      status: "error",
+      message: "Unable to detect brand from URL.",
+      supportedBrands: SUPPORTED_BRANDS,
+    });
+  }
+
+  const fetchUrl = applyLangToUrl(entry.brand, url, lang);
+
+  try {
+    const data = await entry.fetch(fetchUrl);
+    return res.status(200).json({ status: "ok", brand: entry.brand, data });
+  } catch (error) {
+    if (error.name === "UpstreamBlockError") {
+      return res.status(502).json({ status: "error", brand: entry.brand, message: error.message, details: error.details });
+    }
+    if (typeof error?.message === "string" && error.message.includes("Executable doesn't exist")) {
+      return res.status(503).json({ status: "error", message: "Playwright Chromium is not installed. Run 'npx playwright install chromium' in the sidecar project." });
+    }
+    if (error instanceof TypeError || error.name === "InvalidUrlError") {
+      return res.status(400).json({ status: "error", message: error.message });
+    }
+    console.error(error);
+    return res.status(500).json({ status: "error", brand: entry.brand, message: "Unable to fetch product details." });
+  }
+};
 export const getBershkaProduct = makeInditexHandler(fetchBershkaProductDetails, BershkaUpstreamBlockError);
 
 export const getHmProduct = async (req, res) => {
