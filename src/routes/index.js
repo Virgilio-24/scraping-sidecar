@@ -12,6 +12,7 @@ import {
   getPullAndBearProduct,
   getBershkaProduct,
   getAutoProduct,
+  getAmazonDebug,
 } from "../controllers/product.js";
 
 const router = express.Router();
@@ -28,5 +29,6 @@ router.get("/hm/product", getHmProduct);
 router.get("/pullandbear/product", getPullAndBearProduct);
 router.get("/bershka/product", getBershkaProduct);
 router.get("/product/auto", getAutoProduct);
+router.get("/amazon/debug-price", getAmazonDebug);
 
 export default router;
