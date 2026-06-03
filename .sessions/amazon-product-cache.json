@@ -282,5 +282,72 @@
       "images": "dom-live"
     },
     "cachedAt": "2026-05-28T10:33:02.528Z"
+  },
+  "B0FC2S9B2C": {
+    "asin": "B0FC2S9B2C",
+    "title": "Vans Vero LS Sapatilhas para homem",
+    "brand": "Visite a Loja da Vans (em Espanhol)",
+    "color": "Preto e branco",
+    "colors": [
+      "Preto e branco",
+      "black and black",
+      "Chipmunk",
+      "Crepúsculo profundo",
+      "Pine Forest",
+      "Mustard Heritage"
+    ],
+    "sizes": [
+      "38,5 UE",
+      "39 UE",
+      "40 UE",
+      "40,5 UE",
+      "41 UE",
+      "42 UE",
+      "42,5 UE",
+      "43 UE",
+      "44 UE",
+      "44,5 UE",
+      "45 UE",
+      "46 UE",
+      "47 UE",
+      "48 UE",
+      "49 UE",
+      "50 UE"
+    ],
+    "variants": [],
+    "price": {
+      "amount": null,
+      "formatted": null,
+      "retailAmount": null,
+      "retailFormatted": null,
+      "discountPercent": null
+    },
+    "images": [
+      "https://m.media-amazon.com/images/I/61dmPOoqLZL._AC_SX695_.jpg",
+      "https://m.media-amazon.com/images/I/71+LXZLKFSL._AC_SY695_.jpg",
+      "https://m.media-amazon.com/images/I/61JUpA83poL._AC_SY695_.jpg",
+      "https://m.media-amazon.com/images/I/71XoYgglRfL._AC_SX695_.jpg",
+      "https://m.media-amazon.com/images/I/61PAuGcmUML._AC_SY695_.jpg",
+      "https://m.media-amazon.com/images/I/610AqIvVW-L._AC_SY695_.jpg",
+      "https://images-eu.ssl-images-amazon.com/images/I/61dmPOoqLZL._AC_SR900,1125,0,C_BR3_.jpg",
+      "https://images-eu.ssl-images-amazon.com/images/I/61JA+XZGo6L._AC_SR555,630,0,C_BR3_.jpg",
+      "https://images-eu.ssl-images-amazon.com/images/I/8117ezJ6VDL._AC_SR555,630,0,C_BR3_.jpg",
+      "https://images-eu.ssl-images-amazon.com/images/I/51T9Zz8NZNL._AC_SR555,630,0,C_BR3_.jpg"
+    ],
+    "url": "https://www.amazon.es/-/pt/dp/B0FC2S9B2C",
+    "market": "es",
+    "sourceChain": [
+      "script-inline",
+      "dom-live"
+    ],
+    "fieldSources": {
+      "title": "script-inline",
+      "brand": "dom-live",
+      "color": "dom-live",
+      "colors": "dom-live",
+      "sizes": "dom-live",
+      "images": "dom-live"
+    },
+    "cachedAt": "2026-06-03T11:25:43.828Z"
   }
 }

@@ -206,5 +206,73 @@
       "images": "html-scan"
     },
     "cachedAt": "2026-05-29T10:53:56.795Z"
+  },
+  "05070904": {
+    "productId": "05070904",
+    "title": "CAMISA RELAXED FIT 100% LINHO",
+    "brand": "Zara",
+    "description": "Camisa relaxed fit confecionada em tecido de linho. Colarinho bowling e manga curta. Parte inferior com aberturas laterais. Fecho frontal com botões.",
+    "color": "Bege-claro",
+    "colors": [
+      "Bege-claro",
+      "Verde-escuro",
+      "Branco",
+      "Castanho / Toupeira",
+      "Preto"
+    ],
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [],
+    "details": [
+      {
+        "name": "EXTERIOR",
+        "value": "100% linho"
+      }
+    ],
+    "price": {
+      "amount": "35.95",
+      "formatted": "35,95 EUR",
+      "retailAmount": null,
+      "retailFormatted": null,
+      "discountPercent": null
+    },
+    "images": [
+      "https://static.zara.net/assets/public/35a8/746d/649f4a00ae42/b9a900ac13f9/05070904052-1-p/05070904052-1-p.jpg?w=750",
+      "https://static.zara.net/assets/public/d6fb/fba9/41cc4f788666/90a3718ccb13/05070904052-1-a1/05070904052-1-a1.jpg?w=750",
+      "https://static.zara.net/assets/public/0101/a214/a3774f9f8789/2edf251de0da/05070904052-1-a2/05070904052-1-a2.jpg?w=750",
+      "https://static.zara.net/assets/public/6551/b47e/e5ef48e28a95/63ecc625c037/05070904052-1-a3/05070904052-1-a3.jpg?w=750",
+      "https://static.zara.net/assets/public/0e81/6baa/32b047869958/b2380f5108e8/05070904052-1-a4/05070904052-1-a4.jpg?w=750",
+      "https://static.zara.net/assets/public/6b64/f6cf/52cc4dc395b2/bca2799a83ee/05070904052-e1/05070904052-e1.jpg?w=750",
+      "https://static.zara.net/assets/public/8dae/7fad/dcd34240aae1/aba81e1b162a/05070904052-e2/05070904052-e2.jpg?w=750",
+      "https://static.zara.net/assets/public/336e/2f28/c062426dae85/ebdbc157425c/05070904052-f1/05070904052-f1.jpg?w=750",
+      "https://static.zara.net/assets/public/c2a5/cbb6/a7634fbaa941/7ea1bd4f9dbe/05070904529-p/05070904529-p.jpg?w=750",
+      "https://static.zara.net/assets/public/dc9e/c8d5/7b1148fd850d/37f351ab7ffc/05070904529-a1/05070904529-a1.jpg?w=750",
+      "https://static.zara.net/assets/public/73c7/9b7c/bd6446b6948a/842d9aa0cc9c/05070904529-a2/05070904529-a2.jpg?w=750",
+      "https://static.zara.net/assets/public/d547/61f8/92f24b2987ef/ebe290709926/05070904529-a3/05070904529-a3.jpg?w=750"
+    ],
+    "url": "https://www.zara.com/pt/pt/camisa-relaxed-fit-100-linho-p05070904.html?v1=495684333",
+    "market": "pt",
+    "sourceChain": [
+      "json-ld",
+      "dom-live",
+      "dom-modal",
+      "html-scan"
+    ],
+    "fieldSources": {
+      "description": "json-ld",
+      "details": "json-ld",
+      "title": "json-ld",
+      "brand": "json-ld",
+      "color": "dom-live",
+      "colors": "dom-live",
+      "sizes": "dom-modal",
+      "price": "json-ld",
+      "images": "html-scan"
+    },
+    "cachedAt": "2026-06-03T08:58:42.126Z"
   }
 }
