@@ -316,8 +316,8 @@
     ],
     "variants": [],
     "price": {
-      "amount": null,
-      "formatted": null,
+      "amount": "44,72",
+      "formatted": "44,72€",
       "retailAmount": null,
       "retailFormatted": null,
       "discountPercent": null
@@ -346,8 +346,9 @@
       "color": "dom-live",
       "colors": "dom-live",
       "sizes": "dom-live",
+      "price": "dom-live",
       "images": "dom-live"
     },
-    "cachedAt": "2026-06-03T11:25:43.828Z"
+    "cachedAt": "2026-06-03T21:58:10.305Z"
   }
 }
