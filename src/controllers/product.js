@@ -1,4 +1,5 @@
 ﻿import { getProxySummary } from "../services/proxy-pool.js";
+import { normalizeProductResponse } from "../utils/normalize.js";
 import { UpstreamBlockError, fetchProductDetails } from "../services/shein.js";
 import {
   UpstreamBlockError as TemuUpstreamBlockError,
@@ -7,6 +8,7 @@ import {
 import {
   UpstreamBlockError as AmazonUpstreamBlockError,
   fetchProductDetails as fetchAmazonProductDetails,
+  debugPriceDom,
 } from "../services/amazon.js";
 import {
   UpstreamBlockError as ZalandoUpstreamBlockError,
@@ -34,6 +36,18 @@ import {
 } from "../services/bershka.js";
 import { detectBrand, SUPPORTED_BRANDS } from "../services/brand-router.js";
 
+export const getAmazonDebug = async (req, res) => {
+  const { url, proxies: rawProxies } = req.query;
+  const fetchOptions = { proxyUrls: parseProxies(rawProxies) };
+  if (!url) return res.status(400).json({ status: "error", message: "url required" });
+  try {
+    const data = await debugPriceDom(url);
+    return res.status(200).json({ status: "ok", data });
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
 export const getHealth = (req, res) => {
   res.status(200).json({ status: "ok" });
 };
@@ -45,8 +59,12 @@ export const getProxyMetrics = (req, res) => {
   });
 };
 
+const parseProxies = (raw) =>
+  raw ? raw.split(",").map((p) => p.trim()).filter(Boolean) : [];
+
 export const getProduct = async (req, res) => {
-  const { url } = req.query;
+  const { url, proxies: rawProxies } = req.query;
+  const fetchOptions = { proxyUrls: parseProxies(rawProxies) };
 
   if (!url) {
     return res.status(400).json({
@@ -56,11 +74,12 @@ export const getProduct = async (req, res) => {
   }
 
   try {
-    const data = await fetchProductDetails(url);
+    const data = await fetchProductDetails(url, fetchOptions);
 
     return res.status(200).json({
       status: "ok",
-      data,
+      brand: "shein",
+      data: normalizeProductResponse("shein", data),
     });
   } catch (error) {
     if (error instanceof UpstreamBlockError) {
@@ -99,7 +118,8 @@ export const getProduct = async (req, res) => {
 };
 
 export const getTemuProduct = async (req, res) => {
-  const { url } = req.query;
+  const { url, proxies: rawProxies } = req.query;
+  const fetchOptions = { proxyUrls: parseProxies(rawProxies) };
 
   if (!url) {
     return res.status(400).json({
@@ -109,11 +129,12 @@ export const getTemuProduct = async (req, res) => {
   }
 
   try {
-    const data = await fetchTemuProductDetails(url);
+    const data = await fetchTemuProductDetails(url, fetchOptions);
 
     return res.status(200).json({
       status: "ok",
-      data,
+      brand: "temu",
+      data: normalizeProductResponse("temu", data),
     });
   } catch (error) {
     if (error instanceof TemuUpstreamBlockError) {
@@ -152,7 +173,8 @@ export const getTemuProduct = async (req, res) => {
 };
 
 export const getAmazonProduct = async (req, res) => {
-  const { url } = req.query;
+  const { url, proxies: rawProxies } = req.query;
+  const fetchOptions = { proxyUrls: parseProxies(rawProxies) };
 
   if (!url) {
     return res.status(400).json({
@@ -162,11 +184,12 @@ export const getAmazonProduct = async (req, res) => {
   }
 
   try {
-    const data = await fetchAmazonProductDetails(url);
+    const data = await fetchAmazonProductDetails(url, fetchOptions);
 
     return res.status(200).json({
       status: "ok",
-      data,
+      brand: "amazon",
+      data: normalizeProductResponse("amazon", data),
     });
   } catch (error) {
     if (error instanceof AmazonUpstreamBlockError) {
@@ -205,7 +228,8 @@ export const getAmazonProduct = async (req, res) => {
 };
 
 export const getZalandoProduct = async (req, res) => {
-  const { url } = req.query;
+  const { url, proxies: rawProxies } = req.query;
+  const fetchOptions = { proxyUrls: parseProxies(rawProxies) };
 
   if (!url) {
     return res.status(400).json({
@@ -215,11 +239,12 @@ export const getZalandoProduct = async (req, res) => {
   }
 
   try {
-    const data = await fetchZalandoProductDetails(url);
+    const data = await fetchZalandoProductDetails(url, fetchOptions);
 
     return res.status(200).json({
       status: "ok",
-      data,
+      brand: "zalando",
+      data: normalizeProductResponse("zalando", data),
     });
   } catch (error) {
     if (error instanceof ZalandoUpstreamBlockError) {
@@ -258,7 +283,8 @@ export const getZalandoProduct = async (req, res) => {
 };
 
 export const getZaraProduct = async (req, res) => {
-  const { url } = req.query;
+  const { url, proxies: rawProxies } = req.query;
+  const fetchOptions = { proxyUrls: parseProxies(rawProxies) };
 
   if (!url) {
     return res.status(400).json({
@@ -268,11 +294,12 @@ export const getZaraProduct = async (req, res) => {
   }
 
   try {
-    const data = await fetchZaraProductDetails(url);
+    const data = await fetchZaraProductDetails(url, fetchOptions);
 
     return res.status(200).json({
       status: "ok",
-      data,
+      brand: "zara",
+      data: normalizeProductResponse("zara", data),
     });
   } catch (error) {
     if (error instanceof ZaraUpstreamBlockError) {
@@ -311,7 +338,8 @@ export const getZaraProduct = async (req, res) => {
 };
 
 export const getAboutYouProduct = async (req, res) => {
-  const { url } = req.query;
+  const { url, proxies: rawProxies } = req.query;
+  const fetchOptions = { proxyUrls: parseProxies(rawProxies) };
 
   if (!url) {
     return res.status(400).json({
@@ -321,11 +349,12 @@ export const getAboutYouProduct = async (req, res) => {
   }
 
   try {
-    const data = await fetchAboutYouProductDetails(url);
+    const data = await fetchAboutYouProductDetails(url, fetchOptions);
 
     return res.status(200).json({
       status: "ok",
-      data,
+      brand: "aboutyou",
+      data: normalizeProductResponse("aboutyou", data),
     });
   } catch (error) {
     if (error instanceof AboutYouUpstreamBlockError) {
@@ -364,12 +393,13 @@ export const getAboutYouProduct = async (req, res) => {
 };
 
 
-const makeInditexHandler = (fetchFn, BlockError) => async (req, res) => {
-  const { url } = req.query;
+const makeInditexHandler = (fetchFn, BlockError, brand) => async (req, res) => {
+  const { url, proxies: rawProxies } = req.query;
+  const fetchOptions = { proxyUrls: parseProxies(rawProxies) };
   if (!url) return res.status(400).json({ status: "error", message: "Query string 'url' is required." });
   try {
-    const data = await fetchFn(url);
-    return res.status(200).json({ status: "ok", data });
+    const data = await fetchFn(url, fetchOptions);
+    return res.status(200).json({ status: "ok", brand, data: normalizeProductResponse(brand, data) });
   } catch (error) {
     if (error instanceof BlockError)
       return res.status(502).json({ status: "error", message: error.message, details: error.details });
@@ -382,7 +412,7 @@ const makeInditexHandler = (fetchFn, BlockError) => async (req, res) => {
   }
 };
 
-export const getPullAndBearProduct = makeInditexHandler(fetchPullAndBearProductDetails, PullAndBearUpstreamBlockError);
+export const getPullAndBearProduct = makeInditexHandler(fetchPullAndBearProductDetails, PullAndBearUpstreamBlockError, "pullandbear");
 
 const LANG_TO_AMAZON_PARAM = {
   pt: "pt_PT", en: "en_GB", es: "es_ES", de: "de_DE", fr: "fr_FR", it: "it_IT",
@@ -405,7 +435,8 @@ const applyLangToUrl = (brand, url, lang) => {
 };
 
 export const getAutoProduct = async (req, res) => {
-  const { url, lang } = req.query;
+  const { url, lang, proxies: rawProxies } = req.query;
+  const fetchOptions = { proxyUrls: parseProxies(rawProxies) };
 
   if (!url) {
     return res.status(400).json({ status: "error", message: "Query string 'url' is required." });
@@ -424,8 +455,8 @@ export const getAutoProduct = async (req, res) => {
   const fetchUrl = applyLangToUrl(entry.brand, url, lang);
 
   try {
-    const data = await entry.fetch(fetchUrl);
-    return res.status(200).json({ status: "ok", brand: entry.brand, data });
+    const data = await entry.fetch(fetchUrl, fetchOptions);
+    return res.status(200).json({ status: "ok", brand: entry.brand, data: normalizeProductResponse(entry.brand, data) });
   } catch (error) {
     if (error.name === "UpstreamBlockError") {
       return res.status(502).json({ status: "error", brand: entry.brand, message: error.message, details: error.details });
@@ -440,14 +471,15 @@ export const getAutoProduct = async (req, res) => {
     return res.status(500).json({ status: "error", brand: entry.brand, message: "Unable to fetch product details." });
   }
 };
-export const getBershkaProduct = makeInditexHandler(fetchBershkaProductDetails, BershkaUpstreamBlockError);
+export const getBershkaProduct = makeInditexHandler(fetchBershkaProductDetails, BershkaUpstreamBlockError, "bershka");
 
 export const getHmProduct = async (req, res) => {
-  const { url } = req.query;
+  const { url, proxies: rawProxies } = req.query;
+  const fetchOptions = { proxyUrls: parseProxies(rawProxies) };
   if (!url) return res.status(400).json({ status: "error", message: "Query string 'url' is required." });
   try {
-    const data = await fetchHmProductDetails(url);
-    return res.status(200).json({ status: "ok", data });
+    const data = await fetchHmProductDetails(url, fetchOptions);
+    return res.status(200).json({ status: "ok", brand: "hm", data: normalizeProductResponse("hm", data) });
   } catch (error) {
     if (error instanceof HmUpstreamBlockError)
       return res.status(502).json({ status: "error", message: error.message, details: error.details });
