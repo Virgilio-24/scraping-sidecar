@@ -10,5 +10,10 @@ services:
       NAVIGATION_TIMEOUT_MS: 45000
       PAGE_WAIT_MS: 4000
       RETRY_ATTEMPTS: 3
+      PREWARM_HOME_MS: 0
+      # PROXY_URLS: "http://user:pass@proxy1:port,http://user:pass@proxy2:port"
     volumes:
-      - ./sessions:/app/.sessions
+      - sessions:/app/.sessions
+
+volumes:
+  sessions:
