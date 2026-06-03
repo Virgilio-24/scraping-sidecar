@@ -4,6 +4,7 @@ import { config, resolveProjectPath } from "../config.js";
 import { withPage } from "./browser.js";
 import {
   getAttemptPlan,
+  buildRequestAttemptPlan,
   getProxyMetrics,
   recordCandidateFailure,
   recordCandidateSuccess,
@@ -351,8 +352,11 @@ const parseProductUrl = (productUrl) => {
   };
 };
 
-const buildAttempts = (productContext) => {
-  return getAttemptPlan(config.retryAttempts).map((candidate, index) => ({
+const buildAttempts = (productContext, proxyUrls) => {
+  const plan = proxyUrls?.length
+    ? buildRequestAttemptPlan(proxyUrls, config.retryAttempts)
+    : getAttemptPlan(config.retryAttempts);
+  return plan.map((candidate, index) => ({
     ...candidate,
     attemptNumber: index + 1,
     profileKey:
@@ -1180,9 +1184,9 @@ const classifyAttemptError = (error) => {
   };
 };
 
-export const fetchProductDetails = async (productUrl) => {
+export const fetchProductDetails = async (productUrl, options = {}) => {
   const productContext = parseProductUrl(productUrl);
-  const attempts = buildAttempts(productContext);
+  const attempts = buildAttempts(productContext, options.proxyUrls);
   const failureHistory = [];
   const cachedProducts = await readProductCache();
 

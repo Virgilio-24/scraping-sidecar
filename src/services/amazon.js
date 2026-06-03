@@ -4,6 +4,7 @@ import { config, resolveProjectPath } from "../config.js";
 import { withPage } from "./browser.js";
 import {
   getAttemptPlan,
+  buildRequestAttemptPlan,
   getProxyMetrics,
   recordCandidateFailure,
   recordCandidateSuccess,
@@ -234,12 +235,15 @@ const buildAcceptLanguage = (locale) => {
   return `${locale};q=0.9,en;q=0.8`;
 };
 
-const buildAttempts = (productContext) => {
+const buildAttempts = (productContext, proxyUrls) => {
   const profileBase = productContext.langCode
     ? `amazon-${productContext.market}-${productContext.langCode}`
     : `amazon-${productContext.market}`;
 
-  return getAttemptPlan(config.retryAttempts).map((candidate, index) => ({
+  const plan = proxyUrls?.length
+    ? buildRequestAttemptPlan(proxyUrls, config.retryAttempts)
+    : getAttemptPlan(config.retryAttempts);
+  return plan.map((candidate, index) => ({
     ...candidate,
     attemptNumber: index + 1,
     profileKey:
@@ -455,66 +459,100 @@ const extractJsonLdLayer = (html) => {
   };
 };
 
+const PRICE_SELECTORS = [
+  ".a-price.priceToPay .a-offscreen",
+  "#corePriceDisplay_desktop_feature_div .a-price .a-offscreen",
+  ".reinventPricePriceToPayMargin .a-price .a-offscreen",
+  "[data-feature-name='corePriceDisplay'] .a-price .a-offscreen",
+  "#apex_offerDisplay_desktop .a-price .a-offscreen",
+  "#priceblock_ourprice",
+  "#priceblock_dealprice",
+  ".a-price.a-text-price[data-a-color='price'] .a-offscreen",
+  ".a-price .a-offscreen",
+];
+
+const readPriceFromDom = (page) =>
+  page.evaluate((selectors) => {
+    const compact = (v) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim() : "");
+    const parsePrice = (text) => {
+      const match = compact(text).match(/[\d]+(?:[.,]\d+)*/);
+      return match ? match[0].replace(/\.(?=\d{3})/g, "").replace(",", ".") : null;
+    };
+    for (const sel of selectors) {
+      const el = document.querySelector(sel);
+      if (el) {
+        const text = compact(el.textContent);
+        const amount = parsePrice(text);
+        if (amount) return { amount, formatted: text };
+      }
+    }
+    // Fallback: build from .a-price-whole + .a-price-fraction
+    const whole = document.querySelector(".a-price-whole");
+    const fraction = document.querySelector(".a-price-fraction");
+    if (whole) {
+      const w = compact(whole.textContent).replace(/\D/g, "");
+      const f = fraction ? compact(fraction.textContent).replace(/\D/g, "") : "00";
+      if (w) return { amount: `${w}.${f}`, formatted: `${w},${f}` };
+    }
+    return null;
+  }, PRICE_SELECTORS);
+
 const extractPriceViaVariantClick = async (page) => {
   try {
-    // Find first enabled size/variant button — try inline twister, then legacy, then dropdown
-    const clicked = await page.evaluate(() => {
-      const sizeSelectors = [
-        "#inline-twister-expander-content-size_name li:not(.a-disabled) button",
-        "#variation_size_name li:not(.a-disabled) button",
-        "#size_name li:not(.a-disabled) button",
-        "[id^='size-button-']:not([disabled])",
-      ];
-      for (const sel of sizeSelectors) {
-        const btn = document.querySelector(sel);
-        if (btn) { btn.click(); return true; }
+    const SIZE_BUTTON_SELECTORS = [
+      "#inline-twister-expander-content-size_name li:not(.a-disabled) button",
+      "#variation_size_name li:not(.a-disabled) button",
+      "#size_name li:not(.a-disabled) button",
+      "[id^='size-button-']:not([disabled])",
+    ];
+
+    let clicked = false;
+
+    // Use Playwright locator.click() — fires proper pointer + React synthetic events
+    for (const sel of SIZE_BUTTON_SELECTORS) {
+      const btn = page.locator(sel).first();
+      if ((await btn.count()) > 0) {
+        await btn.scrollIntoViewIfNeeded().catch(() => {});
+        await btn.click({ timeout: 3000 }).catch(() => {});
+        clicked = true;
+        break;
       }
-      // Dropdown fallback: select first non-empty option
-      const select = document.querySelector("#native_dropdown_selected_size_name, select[name='dropdown_selected_size_name']");
-      if (select) {
-        const firstOpt = Array.from(select.options).find((o) => o.value && o.value !== "-1");
-        if (firstOpt) { select.value = firstOpt.value; select.dispatchEvent(new Event("change", { bubbles: true })); return true; }
+    }
+
+    // Dropdown fallback
+    if (!clicked) {
+      const select = page.locator(
+        "#native_dropdown_selected_size_name, select[name='dropdown_selected_size_name']"
+      ).first();
+      if ((await select.count()) > 0) {
+        const firstValue = await select.evaluate((el) => {
+          const opt = Array.from(el.options).find((o) => o.value && o.value !== "-1");
+          return opt?.value ?? null;
+        });
+        if (firstValue) {
+          await select.selectOption(firstValue).catch(() => {});
+          clicked = true;
+        }
       }
-      return false;
-    });
+    }
+
+    // Try reading price directly before waiting for click to take effect
+    const immediate = await readPriceFromDom(page);
+    if (immediate) return immediate;
 
     if (!clicked) return null;
 
-    // Wait for price to appear — up to 4 seconds
+    // Wait for price to update — poll for up to 6 seconds
     await page.waitForFunction(
-      () => {
-        const el = document.querySelector(
-          ".a-price.priceToPay .a-offscreen, #priceblock_ourprice, #priceblock_dealprice"
-        );
+      (selectors) => selectors.some((sel) => {
+        const el = document.querySelector(sel);
         return el && el.textContent.trim().length > 0;
-      },
-      { timeout: 4000 }
+      }),
+      PRICE_SELECTORS,
+      { timeout: 6000 }
     ).catch(() => {});
 
-    // Re-read price from DOM
-    return await page.evaluate(() => {
-      const compact = (v) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim() : "");
-      const parsePrice = (text) => {
-        const match = compact(text).match(/[\d.,]+/);
-        return match ? match[0].replace(/,(?=\d{3})/g, "") : null;
-      };
-      const selectors = [
-        ".a-price.priceToPay .a-offscreen",
-        ".a-price.a-text-price[data-a-color='price'] .a-offscreen",
-        "#priceblock_ourprice",
-        "#priceblock_dealprice",
-        ".a-price .a-offscreen",
-      ];
-      for (const sel of selectors) {
-        const el = document.querySelector(sel);
-        if (el) {
-          const text = compact(el.textContent);
-          const amount = parsePrice(text);
-          if (amount) return { amount, formatted: text };
-        }
-      }
-      return null;
-    });
+    return await readPriceFromDom(page);
   } catch {
     return null;
   }
@@ -562,9 +600,13 @@ const extractDomFallback = async (page) => {
 
       const salePriceSelectors = [
         ".a-price.priceToPay .a-offscreen",
-        ".a-price.a-text-price[data-a-color='price'] .a-offscreen",
+        "#corePriceDisplay_desktop_feature_div .a-price .a-offscreen",
+        ".reinventPricePriceToPayMargin .a-price .a-offscreen",
+        "[data-feature-name='corePriceDisplay'] .a-price .a-offscreen",
+        "#apex_offerDisplay_desktop .a-price .a-offscreen",
         "#priceblock_ourprice",
         "#priceblock_dealprice",
+        ".a-price.a-text-price[data-a-color='price'] .a-offscreen",
         ".a-price .a-offscreen",
       ];
 
@@ -573,12 +615,12 @@ const extractDomFallback = async (page) => {
 
       for (const sel of salePriceSelectors) {
         const el = document.querySelector(sel);
-
-        if (el) {
-          salePriceText = compact(el.textContent);
-          salePriceEl = el;
-          break;
-        }
+        if (!el) continue;
+        const text = compact(el.textContent);
+        if (!text) continue;
+        salePriceText = text;
+        salePriceEl = el;
+        break;
       }
 
       let retailPriceText = null;
@@ -1009,9 +1051,9 @@ const classifyAttemptError = (error) => {
   };
 };
 
-export const fetchProductDetails = async (productUrl) => {
+export const fetchProductDetails = async (productUrl, options = {}) => {
   const productContext = parseProductUrl(productUrl);
-  const attempts = buildAttempts(productContext);
+  const attempts = buildAttempts(productContext, options.proxyUrls);
   const failureHistory = [];
   const cachedProducts = await readProductCache();
 
@@ -1121,6 +1163,74 @@ export const fetchProductDetails = async (productUrl) => {
       attemptsTried: attempts.length,
       attemptHistory: failureHistory,
       proxyMetrics: getProxyMetrics(),
+    }
+  );
+};
+
+export const debugPriceDom = async (productUrl) => {
+  const productContext = parseProductUrl(productUrl);
+  const attempt = getAttemptPlan(1)[0];
+
+  return withPage(
+    async (page) => {
+      await page.goto(productContext.productUrl, {
+        waitUntil: "domcontentloaded",
+        timeout: config.navigationTimeoutMs,
+      });
+      await page.waitForTimeout(config.pageWaitMs);
+      await page.waitForSelector("#productTitle", { timeout: 8000 }).catch(() => {});
+
+      const before = await page.evaluate((selectors) => {
+        const compact = (v) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim() : "");
+        return selectors.map((sel) => {
+          const el = document.querySelector(sel);
+          return { selector: sel, found: !!el, text: el ? compact(el.textContent) : null };
+        });
+      }, PRICE_SELECTORS);
+
+      // Try Playwright click on first size button
+      const SIZE_SELECTORS = [
+        "#inline-twister-expander-content-size_name li:not(.a-disabled) button",
+        "#variation_size_name li:not(.a-disabled) button",
+        "#size_name li:not(.a-disabled) button",
+        "[id^='size-button-']:not([disabled])",
+      ];
+      let clickedSel = null;
+      for (const sel of SIZE_SELECTORS) {
+        const btn = page.locator(sel).first();
+        if ((await btn.count()) > 0) {
+          await btn.scrollIntoViewIfNeeded().catch(() => {});
+          await btn.click({ timeout: 3000 }).catch(() => {});
+          clickedSel = sel;
+          break;
+        }
+      }
+
+      await page.waitForTimeout(3000);
+
+      const after = await page.evaluate((selectors) => {
+        const compact = (v) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim() : "");
+        return selectors.map((sel) => {
+          const el = document.querySelector(sel);
+          return { selector: sel, found: !!el, text: el ? compact(el.textContent) : null };
+        });
+      }, PRICE_SELECTORS);
+
+      // Also dump any element with "price" in id or class that has text
+      const priceDump = await page.evaluate(() => {
+        const compact = (v) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim() : "");
+        return Array.from(document.querySelectorAll("[id*='price'],[class*='price']"))
+          .map((el) => ({ tag: el.tagName, id: el.id, cls: el.className.toString().slice(0, 60), text: compact(el.textContent).slice(0, 80) }))
+          .filter((e) => e.text.length > 0 && e.text.length < 40);
+      });
+
+      return { productUrl: productContext.productUrl, clickedSel, before, after, priceDump };
+    },
+    {
+      locale: productContext.locale,
+      profileKey: `amazon-${productContext.market}-debug`,
+      proxyUrl: attempt?.proxyUrl,
+      acceptLanguage: buildAcceptLanguage(productContext.locale),
     }
   );
 };

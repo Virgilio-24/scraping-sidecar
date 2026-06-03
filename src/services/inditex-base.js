@@ -4,6 +4,7 @@ import { config, resolveProjectPath } from "../config.js";
 import { withPage } from "./browser.js";
 import {
   getAttemptPlan,
+  buildRequestAttemptPlan,
   getProxyMetrics,
   recordCandidateFailure,
   recordCandidateSuccess,
@@ -784,8 +785,11 @@ export const createInditexFetcher = (brandConfig) => {
 
   const selectors = { ...DEFAULT_SELECTORS, ...(brandConfig.selectors || {}) };
 
-  const buildAttempts = (productContext) =>
-    getAttemptPlan(config.retryAttempts).map((candidate, index) => ({
+  const buildAttempts = (productContext, proxyUrls) => {
+    const plan = proxyUrls?.length
+      ? buildRequestAttemptPlan(proxyUrls, config.retryAttempts)
+      : getAttemptPlan(config.retryAttempts);
+    return plan.map((candidate, index) => ({
       ...candidate,
       attemptNumber: index + 1,
       profileKey:
@@ -793,6 +797,7 @@ export const createInditexFetcher = (brandConfig) => {
           ? `${profileKeyPrefix}-${productContext.market}-direct`
           : `${profileKeyPrefix}-${productContext.market}-${candidate.label}`,
     }));
+  };
 
   const createAttemptMetadata = (attempt) => ({
     attempt: attempt.attemptNumber,
@@ -813,9 +818,9 @@ export const createInditexFetcher = (brandConfig) => {
     return { message, code: error?.name || "Error", retryable: true };
   };
 
-  const fetchProductDetails = async (productUrl) => {
+  const fetchProductDetails = async (productUrl, options = {}) => {
     const productContext = (brandConfig.parseProductUrl ?? parseProductUrl)(productUrl);
-    const attempts = buildAttempts(productContext);
+    const attempts = buildAttempts(productContext, options.proxyUrls);
     const failureHistory = [];
     const cachedProducts = await readProductCache(cacheFile);
 
