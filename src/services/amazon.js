@@ -196,16 +196,23 @@ const parseProductUrl = (productUrl) => {
   const secondLastPart = hostParts[hostParts.length - 2];
   const market = secondLastPart === "co" ? "uk" : (lastPart === "com" ? "com" : lastPart);
 
-  // Preserve language prefix (e.g. /-/pt/ on amazon.es means "show in Portuguese")
+  const LANG_LOCALE_MAP = { pt: "pt-PT", en: "en-US", es: "es-ES", de: "de-DE", fr: "fr-FR", it: "it-IT" };
+
+  // Language detection priority:
+  // 1. /-/pt/ prefix in path  (e.g. amazon.es/-/pt/dp/XXX)
+  // 2. ?language=pt_PT query param  (e.g. amazon.es/dp/XXX?language=pt_PT)
   const langPrefixMatch = parsedUrl.pathname.match(/^\/-\/([a-z]{2})\//i);
-  const langCode = langPrefixMatch?.[1]?.toLowerCase();
+  const langFromPrefix = langPrefixMatch?.[1]?.toLowerCase();
+  const langFromQuery = parsedUrl.searchParams.get("language")?.split("_")[0]?.toLowerCase();
+  const langCode = langFromPrefix || langFromQuery || null;
   const langPrefix = langCode ? `/-/${langCode}` : "";
 
-  const LANG_LOCALE_MAP = { pt: "pt-PT", en: "en-US", es: "es-ES", de: "de-DE", fr: "fr-FR", it: "it-IT" };
   const locale = (langCode && LANG_LOCALE_MAP[langCode]) || MARKET_LOCALE_MAP[market] || "en-US";
 
+  // Add language param to clean URL so Amazon serves in the right language
   const cleanPath = `${langPrefix}/dp/${asin.toUpperCase()}`;
-  const cleanUrl = `${parsedUrl.origin}${cleanPath}`;
+  const langQuery = langCode && !langFromPrefix ? `?language=${langCode}_${(LANG_LOCALE_MAP[langCode] || "").split("-")[1] || langCode.toUpperCase()}` : "";
+  const cleanUrl = `${parsedUrl.origin}${cleanPath}${langQuery}`;
 
   return {
     asin: asin.toUpperCase(),
@@ -446,6 +453,71 @@ const extractJsonLdLayer = (html) => {
     },
     sourceStage: "json-ld",
   };
+};
+
+const extractPriceViaVariantClick = async (page) => {
+  try {
+    // Find first enabled size/variant button — try inline twister, then legacy, then dropdown
+    const clicked = await page.evaluate(() => {
+      const sizeSelectors = [
+        "#inline-twister-expander-content-size_name li:not(.a-disabled) button",
+        "#variation_size_name li:not(.a-disabled) button",
+        "#size_name li:not(.a-disabled) button",
+        "[id^='size-button-']:not([disabled])",
+      ];
+      for (const sel of sizeSelectors) {
+        const btn = document.querySelector(sel);
+        if (btn) { btn.click(); return true; }
+      }
+      // Dropdown fallback: select first non-empty option
+      const select = document.querySelector("#native_dropdown_selected_size_name, select[name='dropdown_selected_size_name']");
+      if (select) {
+        const firstOpt = Array.from(select.options).find((o) => o.value && o.value !== "-1");
+        if (firstOpt) { select.value = firstOpt.value; select.dispatchEvent(new Event("change", { bubbles: true })); return true; }
+      }
+      return false;
+    });
+
+    if (!clicked) return null;
+
+    // Wait for price to appear — up to 4 seconds
+    await page.waitForFunction(
+      () => {
+        const el = document.querySelector(
+          ".a-price.priceToPay .a-offscreen, #priceblock_ourprice, #priceblock_dealprice"
+        );
+        return el && el.textContent.trim().length > 0;
+      },
+      { timeout: 4000 }
+    ).catch(() => {});
+
+    // Re-read price from DOM
+    return await page.evaluate(() => {
+      const compact = (v) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim() : "");
+      const parsePrice = (text) => {
+        const match = compact(text).match(/[\d.,]+/);
+        return match ? match[0].replace(/,(?=\d{3})/g, "") : null;
+      };
+      const selectors = [
+        ".a-price.priceToPay .a-offscreen",
+        ".a-price.a-text-price[data-a-color='price'] .a-offscreen",
+        "#priceblock_ourprice",
+        "#priceblock_dealprice",
+        ".a-price .a-offscreen",
+      ];
+      for (const sel of selectors) {
+        const el = document.querySelector(sel);
+        if (el) {
+          const text = compact(el.textContent);
+          const amount = parsePrice(text);
+          if (amount) return { amount, formatted: text };
+        }
+      }
+      return null;
+    });
+  } catch {
+    return null;
+  }
 };
 
 const extractDomFallback = async (page) => {
@@ -966,6 +1038,19 @@ export const fetchProductDetails = async (productUrl) => {
           const scriptLayer = extractScriptLayer(snapshot.html, productContext.asin);
           const domLayer = await extractDomFallback(page);
           const mergedData = mergeProductData(productContext, [jsonLdLayer, scriptLayer, domLayer]);
+
+          // Price missing — product requires variant selection (common for clothing/footwear)
+          if (!mergedData.price.amount && mergedData.sizes.length > 0) {
+            const variantPrice = await extractPriceViaVariantClick(page);
+            if (variantPrice) {
+              mergedData.price.amount = variantPrice.amount;
+              mergedData.price.formatted = variantPrice.formatted;
+              mergedData.fieldSources.price = "dom-variant-click";
+              if (!mergedData.sourceChain.includes("dom-variant-click")) {
+                mergedData.sourceChain.push("dom-variant-click");
+              }
+            }
+          }
 
           if (hasUsefulProductData(mergedData)) {
             return mergedData;
