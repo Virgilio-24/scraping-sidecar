@@ -57,8 +57,12 @@ export const getBrowser = async (options = {}) => {
   const proxySettings = resolveProxySettings(options.proxyUrl);
 
   if (!browserPromises.has(browserKey)) {
+    const containerArgs = config.browserHeadless
+      ? ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"]
+      : [];
     browserPromises.set(browserKey, chromium.launch({
       headless: config.browserHeadless,
+      args: containerArgs,
       ...(proxySettings ? { proxy: proxySettings } : {}),
     }));
   }
