@@ -13,6 +13,7 @@ import {
   getBershkaProduct,
   getAutoProduct,
   getAmazonDebug,
+  getAliExpressProduct,
 } from "../controllers/product.js";
 
 const router = express.Router();
@@ -29,6 +30,7 @@ router.get("/hm/product", getHmProduct);
 router.get("/pullandbear/product", getPullAndBearProduct);
 router.get("/bershka/product", getBershkaProduct);
 router.get("/product/auto", getAutoProduct);
+router.get("/aliexpress/product", getAliExpressProduct);
 router.get("/amazon/debug-price", getAmazonDebug);
 
 export default router;
