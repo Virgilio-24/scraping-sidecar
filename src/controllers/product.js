@@ -34,6 +34,10 @@ import {
   UpstreamBlockError as BershkaUpstreamBlockError,
   fetchProductDetails as fetchBershkaProductDetails,
 } from "../services/bershka.js";
+import {
+  UpstreamBlockError as AliExpressUpstreamBlockError,
+  fetchProductDetails as fetchAliExpressProductDetails,
+} from "../services/aliexpress.js";
 import { detectBrand, SUPPORTED_BRANDS } from "../services/brand-router.js";
 
 export const getAmazonDebug = async (req, res) => {
@@ -472,6 +476,7 @@ export const getAutoProduct = async (req, res) => {
   }
 };
 export const getBershkaProduct = makeInditexHandler(fetchBershkaProductDetails, BershkaUpstreamBlockError, "bershka");
+export const getAliExpressProduct = makeInditexHandler(fetchAliExpressProductDetails, AliExpressUpstreamBlockError, "aliexpress");
 
 export const getHmProduct = async (req, res) => {
   const { url, proxies: rawProxies } = req.query;
