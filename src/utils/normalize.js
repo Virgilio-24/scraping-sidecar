@@ -8,6 +8,7 @@ const BRAND_ID_FIELD = {
   zalando:     "articleId",
   shein:       "goodsId",
   temu:        "productId",
+  aliexpress:  "itemId",
   aboutyou:    "articleId",
 };
 
