@@ -1,53 +1,13 @@
 {
   "cookies": [
     {
-      "name": "ITXSESSIONID",
-      "value": "61bc8b08cf2e20ee7e521b591c6da5ee",
-      "domain": ".bershka.com",
-      "path": "/",
-      "expires": 1780480871.759195,
-      "httpOnly": false,
-      "secure": true,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "BSKSESSION",
-      "value": "27b30ba6fd6bade826f5c3865bd70869",
-      "domain": ".bershka.com",
-      "path": "/",
-      "expires": 1780480871.759306,
-      "httpOnly": false,
-      "secure": true,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "bm_mi",
-      "value": "B31DFC9D79132ECBC869CDBB2FCD33CF~YAAQp6Vx1JeZ9HeeAQAAC6rOjAAuYDiMIEuNOO9R6hHzx3VJy+0247zixeQo2PHh2KS9GtYhMEIfews/7Z/itXm2AjqKaSJKcaCpoJgJC5dkdSI5qtd4yLeaZAcNYVFaF8qm6Oum0zv9K4FX6yt2ErpTkUSbRuv2JajG87hTDJvk+cg6mIkEgheWScw0i+Of5RtoL5HyVUI2pg9d0H/G1GJtLX+asE/og1fLCjrArMMu65kJ8b5pFYsOwtJg5h2wSdUqCW6EIaoKD6aXaSKj+/nDtS/1tZ44qLeRQYscRaKHehP0BKXYH4eXogkkRSE=~1",
-      "domain": ".bershka.com",
-      "path": "/",
-      "expires": 1780486014.746158,
-      "httpOnly": false,
-      "secure": true,
-      "sameSite": "Lax"
-    },
-    {
       "name": "CookiesConsent",
       "value": "C0001",
       "domain": "www.bershka.com",
       "path": "/",
-      "expires": 1812015060,
+      "expires": 1812064652,
       "httpOnly": false,
       "secure": false,
-      "sameSite": "Lax"
-    },
-    {
-      "name": "IDROSTA",
-      "value": "2198d4158616:15e618bae91ff229e21f7d22f",
-      "domain": ".bershka.com",
-      "path": "/",
-      "expires": 1780480863.775814,
-      "httpOnly": true,
-      "secure": true,
       "sameSite": "Lax"
     },
     {
@@ -81,48 +41,108 @@
       "sameSite": "Lax"
     },
     {
-      "name": "ak_bmsc",
-      "value": "2893ABA386EBDEF190FAE32F1A93E1AE~000000000000000000000000000000~YAAQBKVx1E/fWYieAQAAY07SjACMvgOQAAKlQzoIcN8OusT0nMLePZMvYC+e+y0nOADl5RnH1aSc1gQ/sslX0/C8IiwvyoA3h5rIcWa89fHtN9+NBsSw3SvB+CZg+Fr5slhknokKKU6mDINgWIWJP4jvs5wZ/Y2Q/3GLWnhFdXiupODeN3uIWulMXd00IP6upGKqc5wjuOCrji69Vny8LWulTCXp4pM5MdhcLpP7qGRBt83tPTn8MYTkdh3tSwRwyXMK24KpTvGBx8WD+dXjDyar+rkEPhhKU6TkHiI2wkmblOSk8R/s7GTnpvqC/FJf3b3h/xGzhlNeG0P8dAzVPIUMK1csz9qdVoGO4/GcQ6IJjS0LBau0ShAo/kLMrk8k6H+Q2WfwYCIrL6f6/TwgZnBY9xBqTXrnV21MR4LTqCRf/o05Tl9mRii15ohRkUw9D1ex2T81gY0RTX4eFz2VdWVc98MB7fnylg2W8fw8mTOflSoZs5+mYq/ZdLXj0PXJ3vq1ItBB38ykidTb4aYUJbK26KxEQx12Dqr2GKRfYW9kiVheURfFyXQskBNhDx7heDc=",
+      "name": "ITXSESSIONID",
+      "value": "36afbb8f54caf170c3219dc5b296e602",
       "domain": ".bershka.com",
       "path": "/",
-      "expires": 1780486014.421678,
+      "expires": 1780530464.373131,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "BSKSESSION",
+      "value": "838013ea899b6ec7611b0c638ea118ce",
+      "domain": ".bershka.com",
+      "path": "/",
+      "expires": 1780530464.373429,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "IDROSTA",
+      "value": "ff132b21af27:2f57c06293c964d84205015ed",
+      "domain": ".bershka.com",
+      "path": "/",
+      "expires": 1780530462.493503,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "bm_mi",
+      "value": "6BD02004A0F215ABF86078566A15D291~YAAQnqVx1Ha+vm6eAQAAEvbGjwCf1nSUm/zDY4F1lacehRG6YqxT9iiLvRicsUFMEJo42AmDgY+K1h4Jw61ijmWXQ7fVX1ibAcstrrdz2UQwZmErx7o2TJqOHJe+v3sYTykTgzXwa8vYxzShwxO2vTyDBizrvvVdBt1QspRf534tiQWCMr/3X4vfcbJaEkjmzpdfFsfBbKM0FWEb0NpjJetCnSozPJntrN9sod5aBsjH6BTGxce48CzhA9HULfQBp6dTNEzKs0RBdmZkJWQHc03Ix2a6oi0EKVWqUZlOBst1dwONzHFmRbGl8LTgp94=~1",
+      "domain": ".bershka.com",
+      "path": "/",
+      "expires": 1780535770.561904,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "ak_bmsc",
+      "value": "EA015732D3E2DA4342696BFB63E47681~000000000000000000000000000000~YAAQnqVx1Ny+vm6eAQAAfgrHjwAx9V3+CtC2vnuau9Bk9fL0/CG39g8GNRMz98/ZtSo7SI/ozPehRIFWSPLbtot98Zcwu3ahtreRXqqysP/XRtNjABMnFWDBRHjxVE1V99QLD/3VdEl+/T2kDpPp4r5zCOmW6yIvze3jxhkj5aNgaXqGe9jHVKzOeJLwdjRyKr3o/9BEN49teT2Vo0U+gYVOP/D3Kn9aBpT+ShGraCm/7FIYiOzLPLmaHSF4HstNAftE0bWwvDMNv9tGi0qSV02u3VWEZWNq33rW+ydaUJVyNeJvFUgVhBKmTZVNCpIo9wRl+q07qBgCZWyrQjqks0947MTzVU4wfCr+6JdOESUaLG8b7k/MsUyBJK3rRC6bL2TDms4yFJ3nkjCayUDj2+rIM+KkhmLBTwbBXGzeInNIjCVeQC7HAWc9p44wS7egTkyDjojQOM+ZW4EWzQN0LXK56nqlKOVEgh89N8vTZ4lnd4WpA41742vR8P2+m886qQY2CvE0wOSlSsWX/g7qZI6EHYGtcjKxEOKgaqfy0nvxjR+LzZVrgRKt",
+      "domain": ".bershka.com",
+      "path": "/",
+      "expires": 1780535770.801276,
       "httpOnly": true,
       "secure": false,
       "sameSite": "Lax"
     },
     {
       "name": "bm_sz",
-      "value": "F7EFA113E32E5FC49C01F7029B94E722~YAAQBKVx1NTgWYieAQAAfWDSjABeyivl3Zt5DCK5kPXuw4hlSNCj+6gdnZv4+ed9mD0D5JHb6xMIpmxD2bCZon6miW/4jTEZN8RV/n04uWM01ZJGlK5w5E57/1EXeWl4D6E3y9RMGvkv0ZZ1vqr8+Gf79fpFhEP1LpL935Zpia01Y4/YuoZ/Q/G0NNo6WPEHMEuGmxTVYYAsv+NLr10rvn1e4VGhZxTYIHJhA8E0xIJydtMM+nm0SJrhkE76bP640DHAHr/bdMbsoj2fJ4nS1CBx1XDtGmD9xsZZH9G0ypCGKImvq6LdRVS03cAXZU/gNPhKqiDqgOxfIoQeO4Us8wz894qQmxLvLCMLb4YjY6RSaeJ5Stb0woS0BZvDX26Z5nB1M9Iw3YB3vtsdpqclkwHtj/mj2EJ/HG2kSwcInM8OZoe+GLG3vkPQ1mafsvSwQg==~4405062~3486786",
+      "value": "E325E81405F058B64A37A694AD41E374~YAAQnqVx1Em/vm6eAQAA6RPHjwDoAbRezGTf/6VCxvpB5i0T1vaiMzXIbIOaEcI+qmT8iqdYZNNNzQ1/Ivh2eyKV2rRMr/fHFEd7pqfQKYS1YIYLIxgHSCXfoP/h+HZtYOZYO5gJdZbunAPzfVId1yS8O1snQmcXDmEqeSKFqzkIbBxp4RR45HPC71tCIkaFZBz0ut2XfWMegpS+pvGw14RUD+miRt8+h1OGDU8KhMlWSK8YxEYDPMG6TfBxYsdr6yg/N6B2p0s9RP+l67mQxecpPrYjmhSVkhf7JodAPUi9veBbyPOmuNpUQXbPPfKRi2KwaJfxPg7Wtmj1E7NY9sNH08e7v8jqOp4hxX/5zB7bV10OwHN0EbXn78FYyLciVE4W4D/LmOZ+Oxwjxh4ktmmPX/DL8a59GqBWfsLF4qAbdDM=~4276791~3551300",
       "domain": ".bershka.com",
       "path": "/",
-      "expires": 1780493214.056034,
+      "expires": 1780542970.224871,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Lax"
     },
     {
       "name": "OptanonConsent",
-      "value": "isGpcEnabled=0&datestamp=Wed+Jun+03+2026+10%3A31%3A00+GMT%2B0100+(Hora+de+ver%C3%A3o+da+Europa+Ocidental)&version=202302.1.0&isIABGlobal=false&hosts=&consentId=8ac3b446-1297-4d46-ab17-53cacba04fe2&interactionCount=1&landingPath=NotLandingPage&groups=C0001%3A1%2CC0003%3A0%2CC0002%3A0%2CC0004%3A0%2CC0005%3A0&AwaitingReconsent=false",
+      "value": "isGpcEnabled=0&datestamp=Thu+Jun+04+2026+00%3A17%3A32+GMT%2B0100+(Hora+de+ver%C3%A3o+da+Europa+Ocidental)&version=202302.1.0&isIABGlobal=false&hosts=&consentId=8ac3b446-1297-4d46-ab17-53cacba04fe2&interactionCount=1&landingPath=NotLandingPage&groups=C0001%3A1%2CC0003%3A0%2CC0002%3A0%2CC0004%3A0%2CC0005%3A0&AwaitingReconsent=false",
       "domain": ".www.bershka.com",
       "path": "/",
-      "expires": 1812015060,
+      "expires": 1812064652,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Lax"
     },
     {
       "name": "_abck",
-      "value": "29D485FD45532C810BB2B3F19653AD34~-1~YAAQBKVx1O/hWYieAQAArGrSjBBDfAH5Y/Vuaxgo0Up6zeSzv9Z9Mr1CFgYib2q7yGs79vb3lLZmAqq4YerphHFp3BRYHsjX8MjyCkclGLyJ2ffg30UKVHzeBGUtYqCJeImtCqiwPnwDjZqdWhjbr0EkdmaBDS5DhndCFhSf60g26y4J777RpTUDJbIPVMyelXb0t2wD3JBNlNxH89Iw/hRXyaSRXtQd2QgZoyv8LP8r+vZd4BDIRId0WF6QxBDT6ORaXb7Wpz6DVkBQjJQRxA9ymVGZHi6nfKqCNOCQwENjXC0Lyk14bUAZHNH5DGuj8RU4MmxL7ZV8ICVLKlUetKu8h2O2v7a5eVJxPcZJefR+X2f/92tl89pkVGf+9hTk1wGg82gGnq1oA2q+en5blZr3tIsxzrE8c7Ylp5l+Q15egfZHeIWfLSGHp0M/WyuBxJo3te3lpUtgiVaOXrIaJp4SmQfJg+ORERDS7DmeKW44nBNRMuKmmJx3X9OIOea5kYwy2+oC4sMh7ylG7iWzlFX+f9m61dG9n5fFy0+waoofiegAYwo65TmbuRh0ifHyC/K5XRTgPONNMTJVPM9p+XcSKxNT/rk9/SLyesMEh6p4669qCqgQtntyr0IQqWCaSckEBMhuLQ1K3S2Lwbv2b49T9UK0lh/8zGdncULETVk/w0SaZwsR7JLcutf+fhiMEqgWLfHCsNqtl0kvZPoZl1E5~-1~-1~1780482416~AAQAAAAF%2f%2f%2f%2f%2f%2fVBBhIhZ9kZUeDrEftSqMstyaQTGOOOhs%2fWOr%2fdKPwxg7L7KtT1gpH5ePVNS8Ay8EKgv8nz2k2oEZ%2fDmxnl0y5uPc9gqCu4cch+O04y0vtnvsgjUiKduq%2fayiC9QpPTg%2fiuLyI%3d~-1",
+      "value": "29D485FD45532C810BB2B3F19653AD34~-1~YAAQnqVx1MC/vm6eAQAAdiLHjxCdWnyhu3uzGcCvPqP7fYw+SI+qDV6wYAnXb9lzjFKaJtUJ/YVOwmM1dUlwHof3ucyWoQdqfh6Z98bH/r7W+anyWDPsSLZ8AuGhzEr8eoz00EIIrTwoiVQ3x1wd38nUuu+S7ogwWb23nzpOmf233Mb8N1bBYt9t99ydp4n64q5KIjbxi7Fm8LTV425oJfyhaApwRTk2KwlhAkng89gcTM8jnbaBU+R6DH0hLiiQwBxr6iTD37DBW4lNuZEhp2TqqS4We16R5/fnLtH68W+G+dNPcY3y9Uo/eWI+/8VmpPz1iPY3SpCPQeZMIJpix1Ndasgv21ju9yZBqf4uKLzmNhMgqf1XoWZyp/sQKKPq6l5Y9dkh74LZ/q7nzBd1wxSwlc7Ep3VhO66ioEny616A8RuKkCxDzVGVVE3qV9mOswrBSYYDEDwS6ion82wk4EzWzwiM9TIKhCCyJhBYehwSDnjbtaaIJmgudR4oWlnMOmFpTldbq0oQIFGCevL7xCyTFCIuHpGpaW8pgyysMdA+a/3yb90SP1cNZyxXhGVTRvWQUDgIN4ngTGVgRrsYNsj+EDOfzZAmWZV1uW65jztpA+qI4vJQL9F6BiN1MP6b5mV1skRKeAbbedpqZvMrStzi7yAUyYPFbM0g250rUdQdPSRGfindaTw=~-1~-1~1780532171~AAQAAAAF%2f%2f%2f%2f%2f6eo+b2wOnq%2fj5iYQrYIClieyDTKdMFNOiOsRIBV61vl4eC7r8StI83Kq4vdPdyFVSxhmWp%2f4GUFza924vrtv6+IGjWcHRhKN5ge~-1",
       "domain": ".bershka.com",
       "path": "/",
-      "expires": 1812015060.665577,
+      "expires": 1812064653.01849,
       "httpOnly": false,
       "secure": true,
       "sameSite": "Lax"
     },
     {
+      "name": "pending_dyid",
+      "value": "3125499105248327184",
+      "domain": "www.bershka.com",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "pending_dyjsession",
+      "value": "6ni9olnqrweibahl6pg9wcfjp21cu7m5",
+      "domain": "www.bershka.com",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
       "name": "TS01a8c9e3",
-      "value": "01d57b118cffa500440eedef0289fb73636167945824666ac87a3269c1611a767d1cf1c51ed99e84a93350f25eb9ff1d3c3b0ed306",
+      "value": "0151a414e75169d6934d39989090afc489c9709489812517db5f3040f703443d9febe5ecaa8b44c17c08e5c93c408780187a054dab",
       "domain": ".www.bershka.com",
       "path": "/",
       "expires": -1,
@@ -132,10 +152,10 @@
     },
     {
       "name": "bm_sv",
-      "value": "9CEADAF3E3B13F73BD6523AE77EEBA14~YAAQBKVx1FPjWYieAQAAzXbSjACjdVvy3mSx7kHIfniFhQH+cjB5Hsi3kgLOIBKuGsWeQg+keS6Ihr3MwSD2VwdO5ysHBmsowXwNKwKRe97fn823QIdKbJjCGJapaFGev+0C5+wHEBlUhWl8q6QkUPLmjlZwVlzzPIetD6ICYjb0zcYTx8vnpF6ahQUaBL89BqByYTyRkuxZ8+YSVrZE82VN7FfB5XbLjhlPuwirTFnBs8IKnwkrTXus3XCA+rHpYZo=~1",
+      "value": "DBD08FA9AEFBBB5ADF05B5B7B9840E73~YAAQnqVx1J/Avm6eAQAA2UfHjwC0U1T+69aP5eIoWQLwf/QHmAEFTlm7Tk40A0XDbEmaBvWulwPyXsNuTgIyl9fGlGmogcnPll9u4YB7xt3Fn4OZwbVV+Hg3cHN7lIC2W0HBOGa5s0lRFmtvCqmQT9oarQISheqm3VKUUWszOuiaBunQpviYWK0h5WEGSkLoKhr/bnLR8fw5kWSdmaJZexpJxvY5UqgRU0O/EeLY9dxuPLMY/XdLCE9gVlw3cZshcEM=~1",
       "domain": ".bershka.com",
       "path": "/",
-      "expires": 1780486014.776071,
+      "expires": 1780535770.494052,
       "httpOnly": false,
       "secure": true,
       "sameSite": "Lax"

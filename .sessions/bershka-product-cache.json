@@ -1,4 +1,62 @@
 {
+  "204654997": {
+    "productId": "204654997",
+    "title": "Calças balloon",
+    "brand": "bershka",
+    "description": "T-shirt sem mangas",
+    "color": null,
+    "colors": [
+      "Cores disponíveis",
+      "Preto",
+      "Pedra",
+      "Vermelho",
+      "Branco"
+    ],
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "variants": [],
+    "details": [],
+    "price": {
+      "amount": "7,99",
+      "formatted": "T-shirt sem mangas 7,99 €",
+      "retailAmount": null,
+      "retailFormatted": null,
+      "discountPercent": null
+    },
+    "images": [
+      "https://static.bershka.net/assets/public/169b/86de/6af34618b32c/05f92c373dda/00070154800-p/00070154800-p.jpg?ts=1765296589079&w=750",
+      "https://static.bershka.net/assets/public/ea6a/be65/37f84899aca1/11cd459cedbc/00070154800-a1t/00070154800-a1t.jpg?ts=1765296589498&w=750",
+      "https://static.bershka.net/assets/public/edc7/c1b2/164344059fe4/cec4cc1ffc8e/00070154800-a2d/00070154800-a2d.jpg?ts=1765296589325&w=750",
+      "https://static.bershka.net/assets/public/f27d/806a/2af2436dba85/e7317b565f0d/00070154800-a3o/00070154800-a3o.jpg?ts=1765378501144&w=750",
+      "https://static.bershka.net/assets/public/d14e/8ff7/49264bf99d6a/f6fc6068f2ea/00070154800-a4o/00070154800-a4o.jpg?ts=1777561208702&w=750",
+      "https://static.bershka.net/assets/public/6ae8/853c/7ad145dabcc5/05f73afaaf98/00070154800-b/00070154800-b.jpg?ts=1777561208569&w=750",
+      "https://static.bershka.net/assets/public/f42c/218c/92fc426fb9c5/6c8bee8627ce/00070154800-r/00070154800-r.jpg?ts=1763375544903&w=750",
+      "https://static.bershka.net/assets/public/0998/e3c6/39084550be8d/785ce530c7fb/00070154805-r/00070154805-r.jpg?ts=1763999109623&w=750"
+    ],
+    "url": "https://www.bershka.com/pt/t-shirt-sem-mangas-c0p204654997.html?colorId=800",
+    "market": "pt",
+    "sourceChain": [
+      "network-json",
+      "json-ld",
+      "dom-live",
+      "html-pattern"
+    ],
+    "fieldSources": {
+      "title": "network-json",
+      "description": "json-ld",
+      "brand": "json-ld",
+      "images": "json-ld",
+      "colors": "dom-live",
+      "price": "dom-live",
+      "sizes": "html-pattern"
+    },
+    "cachedAt": "2026-06-03T23:17:46.059Z"
+  },
   "206803621": {
     "productId": "206803621",
     "title": "Jeans barrel fit bordado",
@@ -48,7 +106,7 @@
       "price": "dom-live",
       "sizes": "html-pattern"
     },
-    "cachedAt": "2026-06-03T09:31:13.175Z"
+    "cachedAt": "2026-06-03T23:16:29.660Z"
   },
   "219636078": {
     "productId": "219636078",
