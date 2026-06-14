@@ -1,4 +1,5 @@
 node_modules/
 .env
+.sessions/
 playwright-report/
 test-results/
