@@ -74,6 +74,23 @@ const uniqueBy = (values, getKey) => {
   });
 };
 
+const cleanTitle = (title) => {
+  if (!title) return null;
+  return title
+    .replace(/\s*-\s*AliExpress\b.*/i, "")
+    .replace(/\s*\|\s*AliExpress\b.*/i, "")
+    .replace(/,\s*\d{3,}$/i, "")        // trailing numeric codes like ", 004" or ", 200000343"
+    .replace(/,\s*[a-z0-9]{1,6}$/i, "") // trailing short codes like ", 004"
+    .trim() || null;
+};
+
+const cleanImageUrl = (url) => {
+  if (!url) return null;
+  // Remove thumbnail suffixes like _220x220q75.jpg_.avif or _220x220xz.jpg_.webp
+  if (/_\d+x\d+/.test(url)) return null;
+  return url;
+};
+
 const normalizeImageUrl = (value) => {
   if (!value || typeof value !== "string") return null;
   if (value.startsWith("//")) return `https:${value}`;
@@ -437,16 +454,18 @@ const extractStructuredFallback = (html) => {
       )
     : [];
 
+  const rawAmount = firstNonEmpty(variantOffer?.price, product.offers?.price);
+
   return {
-    title: firstNonEmpty(product.name, firstVariant?.name),
+    title: cleanTitle(firstNonEmpty(product.name, firstVariant?.name)),
     color: firstNonEmpty(product.color),
     colors: unique([product.color, ...variants.map((v) => v.color)]),
     sizes: unique(variants.map((v) => v.size)),
     variants,
-    images: unique((product.image || []).map(normalizeImageUrl)),
+    images: unique((product.image || []).map(normalizeImageUrl).map(cleanImageUrl).filter(Boolean)),
     price: {
-      amount: firstNonEmpty(variantOffer?.price, product.offers?.price),
-      formatted: null,
+      amount: rawAmount ? String(rawAmount) : null,
+      formatted: rawAmount ? `€${rawAmount}` : null,
       retailAmount: null,
       retailFormatted: null,
       discountPercent: null,
@@ -474,14 +493,37 @@ const extractDomFallback = async (page) => {
       const priceEl = document.querySelector('[class*="price--current"]') || document.querySelector('[class*="uniform-banner-box-price"]');
       const price = compact(priceEl?.textContent);
 
-      const colorEls = Array.from(document.querySelectorAll('[class*="sku-item--color"] img, [class*="sku-property-item"] img'));
-      const colors = unique(colorEls.map((el) => compact(el.getAttribute("title") || el.getAttribute("alt"))));
+      // AliExpress color selectors — try multiple patterns as class names change frequently
+      const colorCandidates = [
+        // Image-based color swatches with title/alt
+        ...Array.from(document.querySelectorAll('[class*="sku"] img[title], [class*="sku"] img[alt]'))
+          .map((el) => compact(el.getAttribute("title") || el.getAttribute("alt"))),
+        // Span/div with aria-label inside sku containers
+        ...Array.from(document.querySelectorAll('[class*="sku"] [aria-label]'))
+          .map((el) => compact(el.getAttribute("aria-label"))),
+        // data-spm-anchor-id often on color items
+        ...Array.from(document.querySelectorAll('[class*="color"] img'))
+          .map((el) => compact(el.getAttribute("title") || el.getAttribute("alt"))),
+      ];
+      const colors = unique(
+        colorCandidates.filter((v) => v && v.length > 1 && v.length <= 50 && !/^\d+$/.test(v))
+      );
 
-      const sizeEls = Array.from(document.querySelectorAll('[class*="sku-item--size"] span, [class*="sku-item--text"]'));
-      const sizes = unique(sizeEls.map((el) => compact(el.textContent)));
+      const sizeEls = Array.from(document.querySelectorAll(
+        '[class*="sku-item--size"] span, [class*="sku-item--text"], ' +
+        '[class*="size-item"], [class*="skuSize"] span'
+      ));
+      const sizes = unique(sizeEls.map((el) => compact(el.textContent)).filter((v) => v && v.length <= 10));
 
-      const imgEls = Array.from(document.querySelectorAll('[class*="slider--img"] img, [class*="product-image"] img'));
-      const images = unique(imgEls.map((el) => normalizeUrl(el.getAttribute("src"))).filter(Boolean));
+      const imgEls = Array.from(document.querySelectorAll(
+        '[class*="slider--img"] img, [class*="product-image"] img, ' +
+        '[class*="gallery"] img, [class*="magnifier"] img'
+      ));
+      const images = unique(
+        imgEls
+          .map((el) => normalizeUrl(el.getAttribute("src") || el.getAttribute("data-src")))
+          .filter((url) => url && !/_\d+x\d+/.test(url))
+      );
 
       if (!title && colors.length === 0 && sizes.length === 0 && images.length === 0) return null;
 
