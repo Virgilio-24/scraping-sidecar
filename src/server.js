@@ -5,6 +5,16 @@ import routes from "./routes/index.js";
 const app = express();
 
 app.use(express.json());
+
+app.use("/api", (req, res, next) => {
+  if (!config.apiKey) return next();
+  const key = req.headers["x-api-key"];
+  if (!key || key !== config.apiKey) {
+    return res.status(401).json({ status: "error", message: "Unauthorized." });
+  }
+  next();
+});
+
 app.use("/api", routes);
 
 app.get("/", (req, res) => {

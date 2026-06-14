@@ -36,6 +36,7 @@ export const config = {
   loginWaitMs: Math.max(numberFromEnv(process.env.LOGIN_WAIT_MS, 300000), 0),
   sessionStateDir: process.env.SESSION_STATE_DIR || ".sessions",
   proxyUrls: parseProxyList(process.env.PROXY_URLS),
+  apiKey: process.env.API_KEY || null,
   browserChannel: process.env.BROWSER_CHANNEL || null,
   userAgent:
     process.env.USER_AGENT ||
