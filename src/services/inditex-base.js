@@ -275,9 +275,18 @@ const extractNetworkLayer = (networkPayload, productContext, cdnHostname) => {
   const currency = CURRENCY_MAP[productContext.market] || "€";
   const formattedPrice = priceAmount ? `${priceAmount} ${currency}` : null;
 
+  // Verify the title against the URL slug to catch cross-sell/recommendation pollution.
+  // The slug encodes the real product name; if no slug word appears in the API title, discard it.
+  const slugWords = (productContext.productUrl || "")
+    .split(/[-/]/)
+    .map((w) => w.toLowerCase())
+    .filter((w) => w.length > 3 && !/^\d+$/.test(w) && !/^(html|http|https|www|com|net)$/.test(w));
+  const apiTitle = (firstNonEmpty(product.name) || "").toLowerCase();
+  const titleVerified = slugWords.length === 0 || slugWords.some((w) => apiTitle.includes(w));
+
   return {
     productId: productContext.productId,
-    title: firstNonEmpty(product.name),
+    title: titleVerified ? firstNonEmpty(product.name) : null,
     brand: null,
     color: selectedColor,
     colors: colorNames,
@@ -499,10 +508,11 @@ const extractHtmlPatternLayer = async (page) => {
           '[id*="color"] [aria-label], [class*="swatch"] [aria-label]'
         )
       );
+      const COLOR_LABEL_RE = /cores?\s+disponíveis|available\s+colo|select\s+colo|choose\s+colo|colou?rs?\s*:/i;
       const colorsFromAriaLabel = unique(
         colorContainerEls
           .map((el) => compact(el.getAttribute("aria-label")))
-          .filter((v) => v && v.length > 1 && v.length <= 50 && !/^\d+$/.test(v))
+          .filter((v) => v && v.length > 1 && v.length <= 50 && !/^\d+$/.test(v) && !COLOR_LABEL_RE.test(v))
       );
 
       // Also try data-name / title attributes on elements near color swatches
@@ -559,10 +569,11 @@ const extractDomFallback = async (page, selectors, brandName, cdnHostname) => {
             sel.colorOptions + ", [class*='color'][aria-label], [class*='swatch'][aria-label]"
           )
         );
+        const COLOR_LABEL_RE = /cores?\s+disponíveis|available\s+colo|select\s+colo|choose\s+colo|colou?rs?\s*:/i;
         const allColors = unique(
           colorOptionEls
             .map((el) => compact(el.getAttribute("aria-label") || el.getAttribute("title") || el.textContent))
-            .filter((v) => v && v.length > 1 && v.length <= 40)
+            .filter((v) => v && v.length > 1 && v.length <= 40 && !COLOR_LABEL_RE.test(v))
         );
         const colors = allColors.length > 0 ? allColors : color ? [color] : [];
 
@@ -870,9 +881,13 @@ export const createInditexFetcher = (brandConfig) => {
 
               // If URL-matched payloads didn't yield colors/sizes, scan ALL captured JSON responses.
               // This handles brands where the API URL doesn't contain the product ID.
+              // Only consider payloads whose serialized JSON contains the productId — avoids
+              // picking up recommendation/related-product widgets that have a different product.
               const needsBroaderScan = !networkLayer || (!(networkLayer.colors?.length) && !(networkLayer.sizes?.length));
               if (needsBroaderScan) {
                 for (const { payload } of collector.getAllPayloads()) {
+                  const payloadStr = JSON.stringify(payload);
+                  if (!payloadStr.includes(productContext.productId)) continue;
                   const candidate = extractNetworkLayer(payload, productContext, cdnHostname);
                   if (candidate && (candidate.colors?.length > 0 || candidate.sizes?.length > 0)) {
                     networkLayer = candidate;

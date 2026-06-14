@@ -63,6 +63,7 @@ export const getBrowser = async (options = {}) => {
     browserPromises.set(browserKey, chromium.launch({
       headless: config.browserHeadless,
       args: containerArgs,
+      channel: config.browserChannel || undefined,
       ...(proxySettings ? { proxy: proxySettings } : {}),
     }));
   }
