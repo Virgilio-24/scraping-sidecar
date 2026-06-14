@@ -14,7 +14,7 @@ const BRAND_MAP = [
   { brand: "pullandbear", match: (h) => h === "www.pullandbear.com" || h === "pullandbear.com",             fetch: fetchPullAndBearProductDetails },
   { brand: "bershka",     match: (h) => h === "www.bershka.com" || h === "bershka.com",                     fetch: fetchBershkaProductDetails },
   { brand: "hm",          match: (h) => h === "www2.hm.com" || h === "www.hm.com" || h === "hm.com",        fetch: fetchHmProductDetails },
-  { brand: "aboutyou",    match: (h) => h.endsWith(".aboutyou.com") || h === "aboutyou.com",                fetch: fetchAboutYouProductDetails },
+  { brand: "aboutyou",    match: (h) => /aboutyou\.[a-z]{2,3}$/.test(h) || h.endsWith(".aboutyou.com"),    fetch: fetchAboutYouProductDetails },
   { brand: "zalando",     match: (h) => h.endsWith(".zalando.com") || /zalando\.[a-z]{2,3}$/.test(h),       fetch: fetchZalandoProductDetails },
   { brand: "amazon",      match: (h) => h.endsWith(".amazon.com") || /amazon\.[a-z]{2,3}$/.test(h),         fetch: fetchAmazonProductDetails },
   { brand: "temu",        match: (h) => h === "www.temu.com" || h === "temu.com",                            fetch: fetchTemuProductDetails },
