@@ -1196,19 +1196,8 @@ export const fetchProductDetails = async (productUrl, options = {}) => {
 
           try {
             await prewarmSession(page);
-            // Start waiting for the product detail API before navigation
-            const goodsDetailPromise = page
-              .waitForResponse(
-                (res) => RESPONSE_TYPES.goodsDetail.test(res.url()) && res.url().includes(productContext.goodsId),
-                { timeout: 20000 }
-              )
-              .catch(() => null);
-
             await navigateToProduct(page, productContext.productUrl);
-
-            // Give the SPA time to render and fire the product API
             await page.waitForTimeout(config.pageWaitMs);
-            await goodsDetailPromise; // wait for product API if not yet captured
 
             try {
               await page.waitForFunction(
