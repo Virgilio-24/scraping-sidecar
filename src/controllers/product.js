@@ -5,6 +5,12 @@ import {
   getSheinSessionStatus,
   clearSheinSession,
 } from "../services/shein-session.js";
+import {
+  captureSession,
+  getAllSessionStatus,
+  clearSession,
+  SITE_CONFIGS,
+} from "../services/session-manager.js";
 import { UpstreamBlockError, fetchProductDetails } from "../services/shein.js";
 import {
   UpstreamBlockError as TemuUpstreamBlockError,
@@ -533,6 +539,49 @@ export const deleteSheinSession = async (req, res) => {
   const market = req.body?.market || req.query?.market || "pt";
   try {
     const result = await clearSheinSession(market);
+    return res.status(200).json({ status: "ok", ...result });
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+// ── Generic session capture (all sites) ──────────────────────────────────────
+
+export const postSessionCapture = async (req, res) => {
+  const site = req.body?.site || req.query?.site;
+  if (!site) {
+    return res.status(400).json({
+      status: "error",
+      message: "Parâmetro 'site' obrigatório.",
+      available: Object.keys(SITE_CONFIGS),
+    });
+  }
+  try {
+    console.log(`[session] A iniciar captura para site="${site}"...`);
+    const result = await captureSession(site);
+    return res.status(200).json({ status: "ok", ...result });
+  } catch (error) {
+    console.error("[session] Erro:", error.message);
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+export const getSessionStatus = async (req, res) => {
+  try {
+    const sessions = await getAllSessionStatus();
+    return res.status(200).json({ status: "ok", sessions });
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+export const deleteSession = async (req, res) => {
+  const site = req.body?.site || req.query?.site;
+  if (!site) {
+    return res.status(400).json({ status: "error", message: "Parâmetro 'site' obrigatório." });
+  }
+  try {
+    const result = await clearSession(site);
     return res.status(200).json({ status: "ok", ...result });
   } catch (error) {
     return res.status(500).json({ status: "error", message: error.message });

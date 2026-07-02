@@ -17,6 +17,9 @@ import {
   postSheinSessionCapture,
   getSheinSessionStatusHandler,
   deleteSheinSession,
+  postSessionCapture,
+  getSessionStatus,
+  deleteSession,
 } from "../controllers/product.js";
 
 const router = express.Router();
@@ -36,9 +39,14 @@ router.get("/product/auto", getAutoProduct);
 router.get("/aliexpress/product", getAliExpressProduct);
 router.get("/amazon/debug-price", getAmazonDebug);
 
-// Shein session capture (opens a visible browser for manual CAPTCHA solving)
+// Shein session capture (legacy — kept for backwards compatibility)
 router.post("/shein/session/capture", postSheinSessionCapture);
 router.get("/shein/session/status", getSheinSessionStatusHandler);
 router.delete("/shein/session", deleteSheinSession);
+
+// Generic session capture for all supported sites
+router.post("/session/capture", postSessionCapture);
+router.get("/session/status", getSessionStatus);
+router.delete("/session", deleteSession);
 
 export default router;
