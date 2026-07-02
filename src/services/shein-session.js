@@ -25,13 +25,7 @@ export const captureSheinSession = async (market = "pt") => {
 
   const profilePath = getProfilePath(market);
 
-  let storageState;
-  try {
-    await fs.access(profilePath);
-    storageState = profilePath;
-  } catch {
-    storageState = undefined;
-  }
+  // Always start fresh — avoids "Invalid parameters" from mismatched cookie domains
 
   // Always launch visible so the user can interact
   const browser = await stealth.launch({
@@ -54,7 +48,6 @@ export const captureSheinSession = async (market = "pt") => {
       extraHTTPHeaders: {
         "Accept-Language": market === "pt" ? "pt-PT,pt;q=0.9,en;q=0.8" : "en-US,en;q=0.9",
       },
-      ...(storageState ? { storageState } : {}),
     });
 
     await context.addInitScript(() => {
