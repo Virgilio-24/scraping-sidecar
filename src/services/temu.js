@@ -11,7 +11,7 @@ import {
 } from "./proxy-pool.js";
 
 const RESPONSE_TYPES = {
-  goodsDetail: /\/api\/poppy\/v1\/goods/i,
+  goodsDetail: /\/api\/poppy\/v1\/goods|\/api\/bg\/.*goods.*detail|\/api\/bg\/.*item.*info|\/api\/oak\/integration\/render/i,
   seoData: /\/api\/seo\/get_page_seo_data/i,
 };
 
@@ -371,7 +371,9 @@ const findCandidateResultObjects = (payload) => {
       "sku_list" in current ||
       "goods_imgs" in current ||
       "display_name" in current ||
-      "goods_name" in current;
+      "goods_name" in current ||
+      ("title" in current && "goods_id" in current) ||
+      ("title" in current && "price_info" in current);
 
     if (hasProductShape) {
       matches.push(current);
@@ -498,6 +500,7 @@ const extractApiData = (bucket, productContext) => {
     return null;
   }
 
+
   const priceInfo = result.price_info || {};
   const skuList = Array.isArray(result.sku_list) ? result.sku_list : [];
   const propertyList = Array.isArray(result.property_list) ? result.property_list : [];
@@ -548,6 +551,12 @@ const extractApiData = (bucket, productContext) => {
   );
 
   const images = extractImages(result);
+  // Also try single image fields from lightweight card responses
+  const singleImage = normalizeImageUrl(
+    typeof result.image === "string" ? result.image :
+    typeof result.thumb_url === "string" ? result.thumb_url : null
+  );
+  if (singleImage && !images.includes(singleImage)) images.unshift(singleImage);
 
   // Price — try price_info, then top-level sale_price / original_price
   const rawPrice = priceInfo.price ?? result.sale_price;
@@ -555,7 +564,7 @@ const extractApiData = (bucket, productContext) => {
 
   return {
     goodsId: productContext.goodsId,
-    title: firstNonEmpty(result.display_name, result.goods_name),
+    title: firstNonEmpty(result.display_name, result.goods_name, result.title),
     color: colors[0] || null,
     colors,
     sizes,
@@ -701,117 +710,107 @@ const extractStructuredFallback = (html) => {
 };
 
 const extractDomFallback = async (page) => {
+  // Wait for React to render the product detail section
+  await page.waitForSelector('h1, [data-testid*="product"], [aria-label*="cor" i], [aria-label*="tamanho" i], [aria-label*="size" i], [aria-label*="color" i]', { timeout: 8000 }).catch(() => null);
+
   try {
     const domData = await page.evaluate(() => {
       const compact = (value) =>
         typeof value === "string" ? value.replace(/\s+/g, " ").trim() : "";
       const unique = (values) => [...new Set(values.filter(Boolean))];
       const normalizeUrl = (value) => {
-        if (!value || typeof value !== "string") {
-          return null;
-        }
-
-        if (value.startsWith("//")) {
-          return `https:${value}`;
-        }
-
-        if (value.startsWith("http://")) {
-          return `https://${value.slice("http://".length)}`;
-        }
-
+        if (!value || typeof value !== "string") return null;
+        if (value.startsWith("//")) return `https:${value}`;
+        if (value.startsWith("http://")) return `https://${value.slice("http://".length)}`;
         return value;
       };
+      const isCdnImg = (src) =>
+        typeof src === "string" && (src.includes("kwcdn.com") || src.includes("temu.com/goods_img") || src.includes("temu.com/img"));
 
       const parseJsonLdBlocks = () =>
         Array.from(document.querySelectorAll("script[type='application/ld+json']"))
           .map((node) => node.textContent?.trim())
           .filter(Boolean)
           .flatMap((source) => {
-            try {
-              return [JSON.parse(source)];
-            } catch {
-              return [];
-            }
+            try { return [JSON.parse(source)]; } catch { return []; }
           });
 
       const findProductJsonLd = (blocks) => {
         const queue = [...blocks];
-
         while (queue.length > 0) {
           const current = queue.shift();
-
-          if (!current) {
-            continue;
-          }
-
-          if (Array.isArray(current)) {
-            queue.push(...current);
-            continue;
-          }
-
-          if (current["@type"] === "ProductGroup" || current["@type"] === "Product") {
-            return current;
-          }
-
+          if (!current) continue;
+          if (Array.isArray(current)) { queue.push(...current); continue; }
+          if (current["@type"] === "ProductGroup" || current["@type"] === "Product") return current;
           for (const value of Object.values(current)) {
-            if (value && typeof value === "object") {
-              queue.push(value);
-            }
+            if (value && typeof value === "object") queue.push(value);
           }
         }
-
         return null;
       };
 
       const product = findProductJsonLd(parseJsonLdBlocks());
 
-      const titleEl =
-        document.querySelector("h1") ||
-        document.querySelector('[class*="title"]');
+      // Title
+      const titleEl = document.querySelector("h1");
       const title = compact(titleEl?.textContent);
 
-      const priceEls = Array.from(document.querySelectorAll('[class*="price"]'));
-      const price = compact(priceEls[0]?.textContent);
-
-      const colorEls = Array.from(
-        document.querySelectorAll('[class*="color"] [class*="item"], [class*="color-item"]')
-      );
+      // Colors — try role="radio" / aria-checked, then aria-label on swatches
+      const colorEls = Array.from(document.querySelectorAll(
+        '[role="radio"][aria-label], [role="option"][aria-label], [aria-checked][aria-label], ' +
+        'button[aria-label*="cor" i], button[aria-label*="color" i], button[aria-label*="colour" i], ' +
+        '[class*="color"] [aria-label], [class*="colour"] [aria-label]'
+      ));
       const colors = unique(
-        colorEls.map((el) =>
-          compact(el.getAttribute("aria-label") || el.getAttribute("title") || el.textContent)
-        )
+        colorEls.map((el) => compact(el.getAttribute("aria-label") || el.getAttribute("title")))
+          .filter((v) => v.length > 0 && v.length < 40)
       );
 
-      const sizeEls = Array.from(
-        document.querySelectorAll('[class*="size"] button, [class*="size-item"]')
+      // Sizes — try role="radio" near size headings, then size button patterns
+      const sizeEls = Array.from(document.querySelectorAll(
+        'button[aria-label*="tamanho" i], button[aria-label*="size" i], button[aria-label*="taille" i], ' +
+        '[role="radio"]:not([aria-label*="cor" i]):not([aria-label*="color" i]):not([aria-label*="colour" i])'
+      ));
+      const sizePattern = /\b(?:\d{2}(?:\/\d{2})?\s*\([A-Z]+\)|XXS|XS|S|M|L|XL|XXL|3XL|4XL|5XL|\d{1,3}(?:\.\d)?(?:cm|mm)?)\b/i;
+      const sizes = unique(
+        sizeEls
+          .map((el) => compact(el.getAttribute("aria-label") || el.textContent))
+          .filter((v) => sizePattern.test(v) && v.length < 20)
       );
-      const sizes = unique(sizeEls.map((el) => compact(el.textContent)));
 
-      const imgEls = Array.from(
-        document.querySelectorAll('[class*="gallery"] img, [class*="swiper"] img, [class*="preview"] img, [class*="detail"] img')
-      );
+      // Images — look for product gallery container first, then fall back to all CDN imgs
+      const galleryContainerSelectors = [
+        '[class*="gallery"]', '[class*="swiper"]', '[class*="preview"]',
+        '[class*="thumbnail"]', '[class*="carousel"]', '[class*="main-img"]',
+        '[class*="product-img"]', '[class*="detail-img"]',
+      ];
+      let imgScope = null;
+      for (const sel of galleryContainerSelectors) {
+        const el = document.querySelector(sel);
+        if (el && el.querySelectorAll("img").length > 0) { imgScope = el; break; }
+      }
+      const allImgs = Array.from((imgScope || document).querySelectorAll("img"));
       const images = unique(
-        imgEls.flatMap((el) => {
-          const src = el.getAttribute("src") || el.getAttribute("data-src") || "";
-          const srcset = el.getAttribute("srcset") || el.getAttribute("data-srcset") || "";
-          const srcsetFirst = srcset.split(",")[0]?.trim().split(" ")[0] || "";
-          return [normalizeUrl(src), normalizeUrl(srcsetFirst)].filter(Boolean);
+        allImgs.flatMap((el) => {
+          const candidates = [
+            el.getAttribute("src"),
+            el.getAttribute("data-src"),
+            (el.getAttribute("srcset") || "").split(",")[0]?.trim().split(" ")[0],
+            (el.getAttribute("data-srcset") || "").split(",")[0]?.trim().split(" ")[0],
+          ];
+          return candidates.map(normalizeUrl).filter((u) => u && isCdnImg(u) && !u.includes("thumbnail") && !u.includes("_60x60") && !u.includes("_100x100"));
         })
-      );
+      ).slice(0, 20); // cap at 20 product images
 
       const jsonLdVariants = Array.isArray(product?.hasVariant)
-        ? product.hasVariant
-            .map((variant) => ({
-              sku: compact(variant?.sku),
-              size: compact(variant?.size),
-              color: compact(variant?.color || product?.color),
-              price: compact(String(variant?.offers?.price || "")),
-              availability: compact(variant?.offers?.availability),
-              url: compact(variant?.offers?.url),
-            }))
-            .filter((variant) =>
-              variant.sku || variant.size || variant.color || variant.price || variant.url
-            )
+        ? product.hasVariant.map((variant) => ({
+            sku: compact(variant?.sku),
+            size: compact(variant?.size),
+            color: compact(variant?.color || product?.color),
+            price: compact(String(variant?.offers?.price || "")),
+            availability: compact(variant?.offers?.availability),
+            url: compact(variant?.offers?.url),
+          })).filter((v) => v.sku || v.size || v.color || v.price || v.url)
         : [];
 
       const allColors = unique([...colors, compact(product?.color)]);
@@ -821,13 +820,7 @@ const extractDomFallback = async (page) => {
         ...(Array.isArray(product?.image) ? product.image.map(normalizeUrl) : []),
       ]);
 
-      if (
-        !title &&
-        allColors.length === 0 &&
-        allSizes.length === 0 &&
-        allImages.length === 0 &&
-        jsonLdVariants.length === 0
-      ) {
+      if (!title && allColors.length === 0 && allSizes.length === 0 && allImages.length === 0 && jsonLdVariants.length === 0) {
         return null;
       }
 
@@ -838,9 +831,8 @@ const extractDomFallback = async (page) => {
         sizes: allSizes,
         variants: jsonLdVariants,
         images: allImages,
-        price: price
-          ? { amount: null, formatted: price, retailAmount: null, retailFormatted: null, discountPercent: null }
-          : null,
+        price: null,
+        _debug: { colorElCount: colorEls.length, sizeElCount: sizeEls.length, imgCount: allImgs.length, cdnImgCount: images.length },
       };
     });
 
@@ -848,10 +840,8 @@ const extractDomFallback = async (page) => {
       return null;
     }
 
-    return {
-      ...domData,
-      sourceStage: "dom-live",
-    };
+    const { _debug, ...rest } = domData;
+    return { ...rest, sourceStage: "dom-live" };
   } catch {
     return null;
   }
@@ -1204,8 +1194,19 @@ export const fetchProductDetails = async (productUrl, options = {}) => {
 
           try {
             await prewarmSession(page);
+            // Start waiting for the product detail API before navigation
+            const goodsDetailPromise = page
+              .waitForResponse(
+                (res) => RESPONSE_TYPES.goodsDetail.test(res.url()) && res.url().includes(productContext.goodsId),
+                { timeout: 20000 }
+              )
+              .catch(() => null);
+
             await navigateToProduct(page, productContext.productUrl);
+
+            // Give the SPA time to render and fire the product API
             await page.waitForTimeout(config.pageWaitMs);
+            await goodsDetailPromise; // wait for product API if not yet captured
 
             try {
               await page.waitForFunction(
