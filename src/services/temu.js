@@ -755,26 +755,28 @@ const extractDomFallback = async (page) => {
       const titleEl = document.querySelector("h1");
       const title = compact(titleEl?.textContent);
 
-      // Colors — try role="radio" / aria-checked, then aria-label on swatches
-      const colorEls = Array.from(document.querySelectorAll(
-        '[role="radio"][aria-label], [role="option"][aria-label], [aria-checked][aria-label], ' +
-        'button[aria-label*="cor" i], button[aria-label*="color" i], button[aria-label*="colour" i], ' +
-        '[class*="color"] [aria-label], [class*="colour"] [aria-label]'
+      // All radio/option elements — separate colors from sizes by content
+      const allOptionEls = Array.from(document.querySelectorAll(
+        '[role="radio"][aria-label], [role="option"][aria-label], [aria-checked][aria-label]'
       ));
+      const sizePattern = /^\s*(?:\d{1,3}(?:[.,]\d)?(?:\s*(?:cm|mm|EU|UK|US))?\s*|XXS|XS|S|M|L|XL|XXL|3XL|4XL|5XL)\s*$/i;
+      const uiLabelPattern = /botão|button|select|tudo|all|fechar|close|mais|more|less|menos/i;
+
+      const cleanLabel = (el) => {
+        const raw = el.getAttribute("aria-label") || el.getAttribute("title") || "";
+        // Strip decorative brackets 【】 「」 《》
+        return raw.replace(/[【】「」《》\[\]]/g, "").trim();
+      };
+
       const colors = unique(
-        colorEls.map((el) => compact(el.getAttribute("aria-label") || el.getAttribute("title")))
-          .filter((v) => v.length > 0 && v.length < 40)
+        allOptionEls
+          .map(cleanLabel)
+          .filter((v) => v.length > 0 && v.length < 40 && !sizePattern.test(v) && !uiLabelPattern.test(v))
       );
 
-      // Sizes — try role="radio" near size headings, then size button patterns
-      const sizeEls = Array.from(document.querySelectorAll(
-        'button[aria-label*="tamanho" i], button[aria-label*="size" i], button[aria-label*="taille" i], ' +
-        '[role="radio"]:not([aria-label*="cor" i]):not([aria-label*="color" i]):not([aria-label*="colour" i])'
-      ));
-      const sizePattern = /\b(?:\d{2}(?:\/\d{2})?\s*\([A-Z]+\)|XXS|XS|S|M|L|XL|XXL|3XL|4XL|5XL|\d{1,3}(?:\.\d)?(?:cm|mm)?)\b/i;
       const sizes = unique(
-        sizeEls
-          .map((el) => compact(el.getAttribute("aria-label") || el.textContent))
+        allOptionEls
+          .map((el) => cleanLabel(el))
           .filter((v) => sizePattern.test(v) && v.length < 20)
       );
 
