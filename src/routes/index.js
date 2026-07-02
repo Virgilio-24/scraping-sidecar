@@ -14,6 +14,9 @@ import {
   getAutoProduct,
   getAmazonDebug,
   getAliExpressProduct,
+  postSheinSessionCapture,
+  getSheinSessionStatusHandler,
+  deleteSheinSession,
 } from "../controllers/product.js";
 
 const router = express.Router();
@@ -32,5 +35,10 @@ router.get("/bershka/product", getBershkaProduct);
 router.get("/product/auto", getAutoProduct);
 router.get("/aliexpress/product", getAliExpressProduct);
 router.get("/amazon/debug-price", getAmazonDebug);
+
+// Shein session capture (opens a visible browser for manual CAPTCHA solving)
+router.post("/shein/session/capture", postSheinSessionCapture);
+router.get("/shein/session/status", getSheinSessionStatusHandler);
+router.delete("/shein/session", deleteSheinSession);
 
 export default router;

@@ -1,5 +1,10 @@
 ﻿import { getProxySummary } from "../services/proxy-pool.js";
 import { normalizeProductResponse } from "../utils/normalize.js";
+import {
+  captureSheinSession,
+  getSheinSessionStatus,
+  clearSheinSession,
+} from "../services/shein-session.js";
 import { UpstreamBlockError, fetchProductDetails } from "../services/shein.js";
 import {
   UpstreamBlockError as TemuUpstreamBlockError,
@@ -494,5 +499,42 @@ export const getHmProduct = async (req, res) => {
       return res.status(400).json({ status: "error", message: error.message });
     console.error(error);
     return res.status(500).json({ status: "error", message: "Unable to fetch product details." });
+  }
+};
+
+// ── Shein session capture ─────────────────────────────────────────────────────
+
+export const postSheinSessionCapture = async (req, res) => {
+  const market = req.body?.market || req.query?.market || "pt";
+  const validMarkets = ["pt", "www", "es", "fr"];
+  if (!validMarkets.includes(market)) {
+    return res.status(400).json({ status: "error", message: `Invalid market. Use: ${validMarkets.join(", ")}` });
+  }
+  try {
+    console.log(`[shein-session] A abrir browser visível para capturar sessão (market=${market})...`);
+    const result = await captureSheinSession(market);
+    return res.status(200).json({ status: "ok", ...result });
+  } catch (error) {
+    console.error("[shein-session] Erro ao capturar sessão:", error);
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+export const getSheinSessionStatusHandler = async (req, res) => {
+  try {
+    const status = await getSheinSessionStatus();
+    return res.status(200).json({ status: "ok", sessions: status });
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+export const deleteSheinSession = async (req, res) => {
+  const market = req.body?.market || req.query?.market || "pt";
+  try {
+    const result = await clearSheinSession(market);
+    return res.status(200).json({ status: "ok", ...result });
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
   }
 };

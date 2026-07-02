@@ -332,7 +332,7 @@ const parseProductUrl = (productUrl) => {
     throw error;
   }
 
-  const goodsIdMatch = parsedUrl.pathname.match(/-p-(\d+)\.html/i);
+  const goodsIdMatch = parsedUrl.pathname.match(/-p-(\d+)(?:-[^.]+)?\.html/i);
 
   if (!goodsIdMatch) {
     const error = new TypeError("Unable to extract goodsId from the provided URL.");
