@@ -433,6 +433,64 @@ const resolveGoodsDetailResult = (bucket, productContext) => {
   )[0];
 };
 
+const extractPropertyValues = (propertyList, namePattern) =>
+  unique(
+    propertyList
+      .filter((prop) => namePattern.test(prop?.property_name || prop?.spec_name || ""))
+      .flatMap((prop) =>
+        (
+          prop.sku_property_values ||
+          prop.value_list ||
+          prop.attr_value_list ||
+          prop.values ||
+          []
+        ).map((v) =>
+          firstNonEmpty(
+            v?.property_value_name,
+            v?.spec_value,
+            v?.value_name,
+            v?.name,
+            typeof v === "string" ? v : null
+          )
+        )
+      )
+  );
+
+const extractSkuSpecs = (skuList, namePattern) =>
+  unique(
+    skuList.flatMap((sku) =>
+      (sku?.specs || sku?.prop_list || [])
+        .filter((s) => namePattern.test(s?.spec_name || s?.prop_name || ""))
+        .map((s) => firstNonEmpty(s?.spec_value, s?.prop_value))
+    )
+  );
+
+const normalizePrice = (value) => {
+  if (typeof value === "number") return String(value / 100);
+  if (typeof value === "string" && value.trim()) return value.trim();
+  return null;
+};
+
+const extractImages = (result) => {
+  const goodsImgs = Array.isArray(result.goods_imgs) ? result.goods_imgs : [];
+  return unique(
+    goodsImgs
+      .map((img) => {
+        if (typeof img === "string") return normalizeImageUrl(img);
+        if (!img || typeof img !== "object") return null;
+        return normalizeImageUrl(
+          img.goods_image_url ||
+            img.origin_url ||
+            img.url ||
+            img.img_url ||
+            img.thumb_url ||
+            img.image_url
+        );
+      })
+      .filter(Boolean)
+  );
+};
+
 const extractApiData = (bucket, productContext) => {
   const result = resolveGoodsDetailResult(bucket, productContext);
 
@@ -441,46 +499,46 @@ const extractApiData = (bucket, productContext) => {
   }
 
   const priceInfo = result.price_info || {};
-  const rawPrice = priceInfo.price;
-  const rawMarketPrice = priceInfo.market_price;
-
+  const skuList = Array.isArray(result.sku_list) ? result.sku_list : [];
   const propertyList = Array.isArray(result.property_list) ? result.property_list : [];
 
-  const colors = unique(
-    propertyList
-      .filter((prop) => /color|colour|cor/i.test(prop?.property_name || ""))
-      .flatMap((prop) =>
-        (prop.sku_property_values || []).map((v) => firstNonEmpty(v?.property_value_name))
-      )
+  // Colors — try property_list first, then color_list, then sku specs
+  const colorsFromProps = extractPropertyValues(propertyList, /color|colour|cor/i);
+  const colorsFromList = unique(
+    (Array.isArray(result.color_list) ? result.color_list : []).map((c) =>
+      firstNonEmpty(c?.color_name, c?.name, typeof c === "string" ? c : null)
+    )
   );
+  const colorsFromSkus = extractSkuSpecs(skuList, /color|colour|cor/i);
+  const colors = unique([...colorsFromProps, ...colorsFromList, ...colorsFromSkus]);
 
-  const sizes = unique(
-    propertyList
-      .filter((prop) => /size|tamanho|taille|talla/i.test(prop?.property_name || ""))
-      .flatMap((prop) =>
-        (prop.sku_property_values || []).map((v) => firstNonEmpty(v?.property_value_name))
-      )
-  );
+  // Sizes — try property_list first, then sku specs
+  const sizesFromProps = extractPropertyValues(propertyList, /size|tamanho|taille|talla/i);
+  const sizesFromSkus = extractSkuSpecs(skuList, /size|tamanho|taille|talla/i);
+  const sizes = unique([...sizesFromProps, ...sizesFromSkus]);
 
-  const skuList = Array.isArray(result.sku_list) ? result.sku_list : [];
   const variants = uniqueBy(
     skuList
       .map((sku) => {
-        if (!sku) {
-          return null;
-        }
+        if (!sku) return null;
 
-        const propMap = sku.sale_prop_map || {};
-        const propValues = Object.values(propMap).filter(Boolean);
+        // Try sale_prop_map (id→value), specs array, prop_list array
+        const propValues = [
+          ...Object.values(sku.sale_prop_map || {}),
+          ...(sku.specs || []).map((s) => s?.spec_value),
+          ...(sku.prop_list || []).map((s) => s?.prop_value),
+        ].filter(Boolean);
+
+        const skuPrice =
+          normalizePrice(sku.price) ||
+          normalizePrice(sku.sale_price) ||
+          normalizePrice(sku.price_info?.price);
 
         return normalizeVariant({
-          sku: firstNonEmpty(String(sku.sku_id || "")),
+          sku: firstNonEmpty(String(sku.sku_id || sku.id || "")),
           size: propValues.find((v) => sizes.includes(v)) || null,
           color: propValues.find((v) => colors.includes(v)) || null,
-          price:
-            typeof sku.price === "number"
-              ? String(sku.price / 100)
-              : firstNonEmpty(String(sku.price || "")),
+          price: skuPrice,
           availability: null,
           url: null,
         });
@@ -489,18 +547,11 @@ const extractApiData = (bucket, productContext) => {
     (variant) => variant.sku || `${variant.size}-${variant.color}`
   );
 
-  const goodsImgs = Array.isArray(result.goods_imgs) ? result.goods_imgs : [];
-  const images = unique(
-    goodsImgs
-      .map((img) => {
-        if (!img || typeof img !== "object") {
-          return null;
-        }
+  const images = extractImages(result);
 
-        return normalizeImageUrl(img.origin_url || img.url || img.thumb_url);
-      })
-      .filter(Boolean)
-  );
+  // Price — try price_info, then top-level sale_price / original_price
+  const rawPrice = priceInfo.price ?? result.sale_price;
+  const rawMarketPrice = priceInfo.market_price ?? result.original_price;
 
   return {
     goodsId: productContext.goodsId,
@@ -511,15 +562,95 @@ const extractApiData = (bucket, productContext) => {
     variants,
     brand: firstNonEmpty(result.brand?.name, result.brand_name),
     price: {
-      amount: typeof rawPrice === "number" ? String(rawPrice / 100) : null,
-      formatted: firstNonEmpty(priceInfo.price_with_symbol),
-      retailAmount: typeof rawMarketPrice === "number" ? String(rawMarketPrice / 100) : null,
-      retailFormatted: firstNonEmpty(priceInfo.market_price_with_symbol),
-      discountPercent: firstNonEmpty(priceInfo.discount_rate),
+      amount: normalizePrice(rawPrice),
+      formatted: firstNonEmpty(priceInfo.price_with_symbol, result.price_with_symbol),
+      retailAmount: normalizePrice(rawMarketPrice),
+      retailFormatted: firstNonEmpty(priceInfo.market_price_with_symbol, result.original_price_with_symbol),
+      discountPercent: firstNonEmpty(priceInfo.discount_rate, result.discount_rate),
     },
     images,
     sourceStage: "network-json",
   };
+};
+
+const extractSsrFallback = async (page, productContext) => {
+  try {
+    const data = await page.evaluate(() => {
+      // Try __NEXT_DATA__ (newer Temu pages)
+      try {
+        const el = document.querySelector("#__NEXT_DATA__");
+        if (el) return { source: "next-data", data: JSON.parse(el.textContent) };
+      } catch {}
+
+      // Try window variables
+      for (const key of ["__INITIAL_STATE__", "__PRELOADED_STATE__", "PAGE_INFO"]) {
+        try {
+          if (window[key]) return { source: key, data: window[key] };
+        } catch {}
+      }
+
+      return null;
+    });
+
+    if (!data) return null;
+
+    // Walk the SSR object looking for a product shape
+    const findProduct = (obj, depth = 0) => {
+      if (depth > 8 || !obj || typeof obj !== "object") return null;
+      if (
+        obj.goods_name ||
+        obj.display_name ||
+        (obj.goods_id && (obj.price_info || obj.sale_price))
+      ) return obj;
+      for (const val of Object.values(obj)) {
+        const found = findProduct(val, depth + 1);
+        if (found) return found;
+      }
+      return null;
+    };
+
+    const product = findProduct(data.data);
+    if (!product) return null;
+
+    const skuList = Array.isArray(product.sku_list) ? product.sku_list : [];
+    const propertyList = Array.isArray(product.property_list) ? product.property_list : [];
+    const colorsFromProps = extractPropertyValues(propertyList, /color|colour|cor/i);
+    const colorsFromList = unique(
+      (Array.isArray(product.color_list) ? product.color_list : []).map((c) =>
+        firstNonEmpty(c?.color_name, c?.name)
+      )
+    );
+    const colors = unique([...colorsFromProps, ...colorsFromList, ...extractSkuSpecs(skuList, /color|colour|cor/i)]);
+    const sizes = unique([
+      ...extractPropertyValues(propertyList, /size|tamanho|taille|talla/i),
+      ...extractSkuSpecs(skuList, /size|tamanho|taille|talla/i),
+    ]);
+    const images = extractImages(product);
+    const priceInfo = product.price_info || {};
+    const rawPrice = priceInfo.price ?? product.sale_price;
+    const rawMarketPrice = priceInfo.market_price ?? product.original_price;
+
+    return {
+      goodsId: firstNonEmpty(String(product.goods_id || productContext.goodsId)),
+      title: firstNonEmpty(product.display_name, product.goods_name),
+      color: colors[0] || null,
+      colors,
+      sizes,
+      variants: [],
+      brand: firstNonEmpty(product.brand?.name, product.brand_name),
+      price: {
+        amount: normalizePrice(rawPrice),
+        formatted: firstNonEmpty(priceInfo.price_with_symbol),
+        retailAmount: normalizePrice(rawMarketPrice),
+        retailFormatted: firstNonEmpty(priceInfo.market_price_with_symbol),
+        discountPercent: firstNonEmpty(priceInfo.discount_rate),
+      },
+      images,
+      sourceStage: `ssr-${data.source}`,
+    };
+  } catch {
+    return null;
+  }
 };
 
 const extractStructuredFallback = (html) => {
@@ -657,10 +788,15 @@ const extractDomFallback = async (page) => {
       const sizes = unique(sizeEls.map((el) => compact(el.textContent)));
 
       const imgEls = Array.from(
-        document.querySelectorAll('[class*="gallery"] img, [class*="swiper"] img')
+        document.querySelectorAll('[class*="gallery"] img, [class*="swiper"] img, [class*="preview"] img, [class*="detail"] img')
       );
       const images = unique(
-        imgEls.map((el) => normalizeUrl(el.getAttribute("src"))).filter(Boolean)
+        imgEls.flatMap((el) => {
+          const src = el.getAttribute("src") || el.getAttribute("data-src") || "";
+          const srcset = el.getAttribute("srcset") || el.getAttribute("data-srcset") || "";
+          const srcsetFirst = srcset.split(",")[0]?.trim().split(" ")[0] || "";
+          return [normalizeUrl(src), normalizeUrl(srcsetFirst)].filter(Boolean);
+        })
       );
 
       const jsonLdVariants = Array.isArray(product?.hasVariant)
@@ -1109,11 +1245,13 @@ export const fetchProductDetails = async (productUrl, options = {}) => {
             }
 
             const networkData = extractApiData(bucket, productContext);
+            const ssrFallback = await extractSsrFallback(page, productContext);
             const structuredFallback = extractStructuredFallback(snapshot.html);
             const domFallback = await extractDomFallback(page);
 
             const mergedData = mergeProductData(productContext, [
               networkData,
+              ssrFallback,
               structuredFallback,
               domFallback,
             ]);
