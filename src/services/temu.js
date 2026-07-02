@@ -713,6 +713,11 @@ const extractDomFallback = async (page) => {
   // Wait for React to render the product detail section
   await page.waitForSelector('h1, [data-testid*="product"], [aria-label*="cor" i], [aria-label*="tamanho" i], [aria-label*="size" i], [aria-label*="color" i]', { timeout: 8000 }).catch(() => null);
 
+  // Scroll to trigger lazy loading of images and variant components
+  await page.evaluate(() => window.scrollTo(0, Math.min(600, document.body.scrollHeight / 2))).catch(() => null);
+  await page.waitForTimeout(1500);
+  await page.evaluate(() => window.scrollTo(0, 0)).catch(() => null);
+
   try {
     const domData = await page.evaluate(() => {
       const compact = (value) =>
@@ -822,7 +827,7 @@ const extractDomFallback = async (page) => {
         ...(Array.isArray(product?.image) ? product.image.map(normalizeUrl) : []),
       ]);
 
-      if (!title && allColors.length === 0 && allSizes.length === 0 && allImages.length === 0 && jsonLdVariants.length === 0) {
+      if (allColors.length === 0 && allSizes.length === 0 && allImages.length === 0 && jsonLdVariants.length === 0) {
         return null;
       }
 
