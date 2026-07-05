@@ -52,8 +52,8 @@ export const captureSessionForProduct = async (siteKey, productUrl, { timeoutMs 
     const context = await browser.newContext({
       locale: site.locale,
       userAgent: config.userAgent,
-      viewport: { width: 1366, height: 768 },
-      screen: { width: 1366, height: 768 },
+      viewport: { width: 1920, height: 1080 },
+      screen: { width: 1920, height: 1080 },
       colorScheme: "light",
       timezoneId: "Europe/Lisbon",
       extraHTTPHeaders: {
@@ -136,8 +136,8 @@ export const captureSession = async (siteKey) => {
     const context = await browser.newContext({
       locale: site.locale,
       userAgent: config.userAgent,
-      viewport: { width: 1366, height: 768 },
-      screen: { width: 1366, height: 768 },
+      viewport: { width: 1920, height: 1080 },
+      screen: { width: 1920, height: 1080 },
       colorScheme: "light",
       timezoneId: "Europe/Lisbon",
       extraHTTPHeaders: {
