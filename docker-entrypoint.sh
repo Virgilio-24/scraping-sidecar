@@ -2,7 +2,7 @@
 set -e
 
 DISPLAY="${DISPLAY:-:99}"
-SCREEN="${SCREEN_RESOLUTION:-1366x768x24}"
+SCREEN="${SCREEN_RESOLUTION:-1360x768x24}"
 VNC_PORT="${VNC_PORT:-5900}"
 NOVNC_PORT="${NOVNC_PORT:-6080}"
 
@@ -17,8 +17,7 @@ echo "[entrypoint] Starting x11vnc on port $VNC_PORT..."
 x11vnc \
   -display "$DISPLAY" \
   -nopw \
-  -listen 0.0.0.0 \
-  -port "$VNC_PORT" \
+  -rfbport "$VNC_PORT" \
   -shared \
   -forever \
   -quiet \

@@ -28,6 +28,6 @@ ENV NODE_ENV=production \
     DISPLAY=:99 \
     VNC_PORT=5900 \
     NOVNC_PORT=6080 \
-    SCREEN_RESOLUTION=1366x768x24
+    SCREEN_RESOLUTION=1360x768x24
 
 CMD ["/docker-entrypoint.sh"]
