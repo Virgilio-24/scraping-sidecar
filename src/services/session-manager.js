@@ -32,6 +32,43 @@ const ensureDir = async () => {
   await fs.mkdir(resolveProjectPath(config.sessionStateDir), { recursive: true });
 };
 
+const dismissOverlays = async (page) => {
+  // Remove fixed/absolute overlays blocking interaction
+  await page.evaluate(() => {
+    document.querySelectorAll("*").forEach((el) => {
+      const style = window.getComputedStyle(el);
+      if (
+        (style.position === "fixed" || style.position === "absolute") &&
+        style.zIndex > 100 &&
+        style.display !== "none" &&
+        !el.querySelector("input, button, a, form")
+      ) {
+        el.style.display = "none";
+      }
+    });
+  }).catch(() => {});
+
+  // Click common consent/accept buttons
+  const cookieSelectors = [
+    'button[id*="accept"]', 'button[class*="accept"]',
+    'button[id*="cookie"]', 'button[class*="cookie"]',
+    'button[id*="consent"]', 'button[class*="consent"]',
+    'button:has-text("Accept")', 'button:has-text("Aceitar")',
+    'button:has-text("Accept All")', 'button:has-text("Aceitar tudo")',
+    'button:has-text("Got it")', 'button:has-text("OK")',
+  ];
+  for (const sel of cookieSelectors) {
+    try {
+      const btn = page.locator(sel).first();
+      if (await btn.isVisible({ timeout: 500 })) {
+        await btn.click();
+        console.log(`[session] Overlay/cookie dispensado (${sel})`);
+        break;
+      }
+    } catch { /* ignore */ }
+  }
+};
+
 // Opens a visible browser on the VNC display, navigates to a product URL,
 // waits until the product page has real content, then saves cookies.
 // Only saves if the product was actually returned (no CAPTCHA remaining).
@@ -75,29 +112,14 @@ export const captureSessionForProduct = async (siteKey, productUrl, { timeoutMs 
     console.log(`[session] A navegar para homepage de ${site.name}...`);
     await page.goto(site.startUrl, { waitUntil: "domcontentloaded", timeout: 60_000 });
 
-    // Auto-dismiss common cookie consent buttons
+    // Auto-dismiss common cookie consent buttons and overlays
     await page.waitForTimeout(2000);
-    const cookieSelectors = [
-      'button[id*="accept"]', 'button[class*="accept"]',
-      'button[id*="cookie"]', 'button[class*="cookie"]',
-      'button[id*="consent"]', 'button[class*="consent"]',
-      'button:has-text("Accept")', 'button:has-text("Aceitar")',
-      'button:has-text("Accept All")', 'button:has-text("Aceitar tudo")',
-      'button:has-text("Got it")', 'button:has-text("OK")',
-    ];
-    for (const sel of cookieSelectors) {
-      try {
-        const btn = page.locator(sel).first();
-        if (await btn.isVisible({ timeout: 500 })) {
-          await btn.click();
-          console.log(`[session] Cookie banner dispensado (${sel})`);
-          break;
-        }
-      } catch { /* ignore */ }
-    }
+    await dismissOverlays(page);
 
     // Now navigate to the product URL
     await page.goto(productUrl, { waitUntil: "domcontentloaded", timeout: 60_000 });
+    await page.waitForTimeout(2000);
+    await dismissOverlays(page);
 
     console.log(`[session] VNC browser aberto → ${productUrl}`);
     console.log(`[session] Aguarda carregamento do produto no VNC (max ${timeoutMs / 1000}s)...`);

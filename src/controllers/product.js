@@ -617,7 +617,7 @@ export const postSessionCaptureForProduct = async (req, res) => {
   });
 
   // Run capture in background (non-blocking)
-  captureSessionForProduct(site, url, { timeoutMs: timeoutMs || 300_000 })
+  captureSessionForProduct(site, url, { timeoutMs: timeoutMs || 600_000 })
     .then((result) => {
       console.log(`[session-vnc] ✅ Sessão capturada para ${site} — ${result.cookieCount} cookies`);
     })
