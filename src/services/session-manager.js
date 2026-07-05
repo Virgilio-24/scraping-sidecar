@@ -35,7 +35,7 @@ const ensureDir = async () => {
 // Opens a visible browser on the VNC display, navigates to a product URL,
 // waits until the product page has real content, then saves cookies.
 // Only saves if the product was actually returned (no CAPTCHA remaining).
-export const captureSessionForProduct = async (siteKey, productUrl, { timeoutMs = 300_000 } = {}) => {
+export const captureSessionForProduct = async (siteKey, productUrl, { timeoutMs = 600_000 } = {}) => {
   const site = SITE_CONFIGS[siteKey];
   if (!site) throw new Error(`Unknown site key: "${siteKey}"`);
 
@@ -70,6 +70,33 @@ export const captureSessionForProduct = async (siteKey, productUrl, { timeoutMs 
     });
 
     const page = await context.newPage();
+
+    // Navigate to homepage first to trigger cookie consent and establish base session
+    console.log(`[session] A navegar para homepage de ${site.name}...`);
+    await page.goto(site.startUrl, { waitUntil: "domcontentloaded", timeout: 60_000 });
+
+    // Auto-dismiss common cookie consent buttons
+    await page.waitForTimeout(2000);
+    const cookieSelectors = [
+      'button[id*="accept"]', 'button[class*="accept"]',
+      'button[id*="cookie"]', 'button[class*="cookie"]',
+      'button[id*="consent"]', 'button[class*="consent"]',
+      'button:has-text("Accept")', 'button:has-text("Aceitar")',
+      'button:has-text("Accept All")', 'button:has-text("Aceitar tudo")',
+      'button:has-text("Got it")', 'button:has-text("OK")',
+    ];
+    for (const sel of cookieSelectors) {
+      try {
+        const btn = page.locator(sel).first();
+        if (await btn.isVisible({ timeout: 500 })) {
+          await btn.click();
+          console.log(`[session] Cookie banner dispensado (${sel})`);
+          break;
+        }
+      } catch { /* ignore */ }
+    }
+
+    // Now navigate to the product URL
     await page.goto(productUrl, { waitUntil: "domcontentloaded", timeout: 60_000 });
 
     console.log(`[session] VNC browser aberto → ${productUrl}`);
