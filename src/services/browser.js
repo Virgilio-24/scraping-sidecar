@@ -127,10 +127,15 @@ export const withPage = async (callback, options = {}) => {
   page.setDefaultNavigationTimeout(config.navigationTimeoutMs);
   page.setDefaultTimeout(config.requestTimeoutMs);
 
+  let succeeded = false;
   try {
-    return await callback(page);
+    const result = await callback(page);
+    succeeded = true;
+    return result;
   } finally {
-    await context.storageState({ path: storageStatePath });
+    if (succeeded) {
+      await context.storageState({ path: storageStatePath });
+    }
     await context.close();
   }
 };
