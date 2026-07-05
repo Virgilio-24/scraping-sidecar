@@ -73,15 +73,19 @@ export const captureSessionForProduct = async (siteKey, productUrl, { timeoutMs 
     await page.goto(productUrl, { waitUntil: "domcontentloaded", timeout: 60_000 });
 
     console.log(`[session] VNC browser aberto → ${productUrl}`);
-    console.log(`[session] Aguarda resolução de CAPTCHA e carregamento do produto (max ${timeoutMs / 1000}s)...`);
+    console.log(`[session] Aguarda carregamento do produto no VNC (max ${timeoutMs / 1000}s)...`);
+    console.log(`[session] Se aparecer login ou CAPTCHA, resolve manualmente no VNC: http://servidor:6080/vnc.html`);
 
-    // Wait until the page has meaningful product content (h1 present + not a bot page)
+    // Wait until the page has meaningful product content (h1 present + not a bot/login page)
     const productLoaded = await page.waitForFunction(
       () => {
         const h1 = document.querySelector("h1");
         const bodyText = document.body?.innerText || "";
+        const url = window.location.href;
         const hasCaptcha = /slide|verify|captcha|security check/i.test(bodyText);
-        return h1 && h1.textContent.trim().length > 5 && !hasCaptcha;
+        const isLoginPage = /login|signin|sign-in|passport|account\/login/i.test(url);
+        const hasLoginForm = !!document.querySelector('input[type="password"]');
+        return h1 && h1.textContent.trim().length > 5 && !hasCaptcha && !isLoginPage && !hasLoginForm;
       },
       { timeout: timeoutMs, polling: 2000 }
     ).then(() => true).catch(() => false);
