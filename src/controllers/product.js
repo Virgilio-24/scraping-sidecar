@@ -7,6 +7,7 @@ import {
 } from "../services/shein-session.js";
 import {
   captureSession,
+  captureSessionForProduct,
   getAllSessionStatus,
   clearSession,
   SITE_CONFIGS,
@@ -586,4 +587,41 @@ export const deleteSession = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ status: "error", message: error.message });
   }
+};
+
+// ── VNC session capture — opens visible browser, waits for product, saves cookies ──
+
+export const postSessionCaptureForProduct = async (req, res) => {
+  const { site, url, timeoutMs } = req.body || {};
+
+  if (!site || !url) {
+    return res.status(400).json({
+      status: "error",
+      message: "Parâmetros obrigatórios: 'site' e 'url' do produto.",
+    });
+  }
+
+  if (!SITE_CONFIGS[site]) {
+    return res.status(400).json({
+      status: "error",
+      message: `Site desconhecido: "${site}". Disponíveis: ${Object.keys(SITE_CONFIGS).join(", ")}`,
+    });
+  }
+
+  // Respond immediately — the browser will open on VNC, this runs in background
+  res.status(202).json({
+    status: "capturing",
+    message: `Browser VNC aberto para ${SITE_CONFIGS[site].name}. Abre http://servidor:6080 para resolver o CAPTCHA. Os cookies só serão guardados quando o produto carregar.`,
+    site,
+    url,
+  });
+
+  // Run capture in background (non-blocking)
+  captureSessionForProduct(site, url, { timeoutMs: timeoutMs || 300_000 })
+    .then((result) => {
+      console.log(`[session-vnc] ✅ Sessão capturada para ${site} — ${result.cookieCount} cookies`);
+    })
+    .catch((err) => {
+      console.error(`[session-vnc] ❌ Falha ao capturar sessão para ${site}: ${err.message}`);
+    });
 };

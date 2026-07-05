@@ -20,6 +20,7 @@ import {
   postSessionCapture,
   getSessionStatus,
   deleteSession,
+  postSessionCaptureForProduct,
 } from "../controllers/product.js";
 
 const router = express.Router();
@@ -48,5 +49,8 @@ router.delete("/shein/session", deleteSheinSession);
 router.post("/session/capture", postSessionCapture);
 router.get("/session/status", getSessionStatus);
 router.delete("/session", deleteSession);
+
+// VNC session capture — opens visible browser on server, waits for product, saves cookies
+router.post("/session/capture-vnc", postSessionCaptureForProduct);
 
 export default router;

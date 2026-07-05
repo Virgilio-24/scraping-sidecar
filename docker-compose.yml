@@ -3,9 +3,10 @@ services:
     build: .
     restart: unless-stopped
     ports:
-      - "3002:3002"
+      - "3002:3003"
+      - "6080:6080"
     environment:
-      PORT: 3002
+      PORT: 3003
       BROWSER_HEADLESS: "true"
       NAVIGATION_TIMEOUT_MS: 45000
       PAGE_WAIT_MS: 4000

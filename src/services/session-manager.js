@@ -32,6 +32,86 @@ const ensureDir = async () => {
   await fs.mkdir(resolveProjectPath(config.sessionStateDir), { recursive: true });
 };
 
+// Opens a visible browser on the VNC display, navigates to a product URL,
+// waits until the product page has real content, then saves cookies.
+// Only saves if the product was actually returned (no CAPTCHA remaining).
+export const captureSessionForProduct = async (siteKey, productUrl, { timeoutMs = 300_000 } = {}) => {
+  const site = SITE_CONFIGS[siteKey];
+  if (!site) throw new Error(`Unknown site key: "${siteKey}"`);
+
+  await ensureDir();
+  const profilePath = getProfilePath(site.profileKey);
+
+  const browser = await chromium.launch({
+    headless: false,
+    args: ["--disable-blink-features=AutomationControlled"],
+    channel: config.browserChannel || undefined,
+  });
+
+  try {
+    const context = await browser.newContext({
+      locale: site.locale,
+      userAgent: config.userAgent,
+      viewport: { width: 1366, height: 768 },
+      screen: { width: 1366, height: 768 },
+      colorScheme: "light",
+      timezoneId: "Europe/Lisbon",
+      extraHTTPHeaders: {
+        "Accept-Language": site.locale === "pt-PT"
+          ? "pt-PT,pt;q=0.9,en;q=0.8"
+          : `${site.locale},en;q=0.8`,
+      },
+    });
+
+    await context.addInitScript(() => {
+      Object.defineProperty(navigator, "webdriver", { get: () => undefined });
+      Object.defineProperty(navigator, "platform", { get: () => "Win32" });
+      if (!window.chrome) window.chrome = { runtime: {} };
+    });
+
+    const page = await context.newPage();
+    await page.goto(productUrl, { waitUntil: "domcontentloaded", timeout: 60_000 });
+
+    console.log(`[session] VNC browser aberto → ${productUrl}`);
+    console.log(`[session] Aguarda resolução de CAPTCHA e carregamento do produto (max ${timeoutMs / 1000}s)...`);
+
+    // Wait until the page has meaningful product content (h1 present + not a bot page)
+    const productLoaded = await page.waitForFunction(
+      () => {
+        const h1 = document.querySelector("h1");
+        const bodyText = document.body?.innerText || "";
+        const hasCaptcha = /slide|verify|captcha|security check/i.test(bodyText);
+        return h1 && h1.textContent.trim().length > 5 && !hasCaptcha;
+      },
+      { timeout: timeoutMs, polling: 2000 }
+    ).then(() => true).catch(() => false);
+
+    if (!productLoaded) {
+      throw new Error("Timeout: product page did not load within the allowed time. Cookies NOT saved.");
+    }
+
+    // Product loaded successfully — save session
+    await context.storageState({ path: profilePath });
+    await context.close();
+
+    const saved = JSON.parse(await fs.readFile(profilePath, "utf8"));
+    const cookieCount = (saved.cookies || []).length;
+
+    console.log(`[session] ✅ Produto carregado — sessão guardada (${cookieCount} cookies)`);
+
+    return {
+      site: siteKey,
+      name: site.name,
+      profileKey: site.profileKey,
+      profilePath,
+      cookieCount,
+      savedAt: new Date().toISOString(),
+    };
+  } finally {
+    await browser.close();
+  }
+};
+
 export const captureSession = async (siteKey) => {
   const site = SITE_CONFIGS[siteKey];
   if (!site) {
