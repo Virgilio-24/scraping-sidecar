@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { config, resolveProjectPath } from "../config.js";
-import { withPage } from "./browser.js";
+import { withPage, clearSessionProfile } from "./browser.js";
 import {
   getAttemptPlan,
   buildRequestAttemptPlan,
@@ -250,7 +250,8 @@ const parseCapturedResponse = async (response) => {
 
 const attachResponseCollector = (page, bucket) => {
   const handler = async (response) => {
-    const responseType = resolveResponseType(response.url());
+    const url = response.url();
+    const responseType = resolveResponseType(url);
 
     if (!responseType) {
       return;
@@ -430,9 +431,17 @@ const resolveGoodsDetailResult = (bucket, productContext) => {
     return null;
   }
 
-  return candidates.sort(
-    (left, right) => scoreCandidateResult(right, productContext) - scoreCandidateResult(left, productContext)
-  )[0];
+  const scored = candidates
+    .map((c) => ({ candidate: c, score: scoreCandidateResult(c, productContext) }))
+    .sort((a, b) => b.score - a.score);
+
+  // Only use data that explicitly matches our goodsId — discard "similar products" cards
+  const best = scored[0];
+  if (best.score < 100) {
+    return null;
+  }
+
+  return best.candidate;
 };
 
 const extractPropertyValues = (propertyList, namePattern) =>
@@ -709,14 +718,67 @@ const extractStructuredFallback = (html) => {
   };
 };
 
+// Direct fetch to product detail API using the browser's active cookies/session
+const extractDirectApiFetch = async (page, productContext) => {
+  const { goodsId } = productContext;
+  if (!goodsId) return null;
+
+  // Known Temu product detail endpoint patterns to try
+  const endpoints = [
+    {
+      url: `/pt/api/bg/bg-nautilus-api/goods/get_goods_detail`,
+      body: { goods_id: goodsId, scene: "goods_detail", language: "pt-PT" },
+    },
+    {
+      url: `/pt/api/poppy/v1/goods`,
+      body: { goods_id: goodsId, scene: "goods_detail" },
+    },
+    {
+      url: `/pt/api/bg/goods/get_goods_detail`,
+      body: { goods_id: goodsId },
+    },
+  ];
+
+  for (const endpoint of endpoints) {
+    try {
+      const result = await page.evaluate(async ({ url, body }) => {
+        const res = await fetch(url, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) return { status: res.status };
+        return { status: res.status, data: await res.json() };
+      }, endpoint);
+
+      if (!result?.data) continue;
+
+      const payload = result.data;
+      const extracted = extractApiData({ goodsDetail: [{ url: endpoint.url, payload }] }, productContext);
+      if (extracted) {
+        extracted.sourceStage = "direct-api";
+        return extracted;
+      }
+    } catch {
+      // endpoint not available
+    }
+  }
+
+  return null;
+};
+
 const extractDomFallback = async (page) => {
   // Wait for React to render the product detail section
   await page.waitForSelector('h1, [data-testid*="product"], [aria-label*="cor" i], [aria-label*="tamanho" i], [aria-label*="size" i], [aria-label*="color" i]', { timeout: 8000 }).catch(() => null);
 
-  // Scroll to trigger lazy loading of images and variant components
-  await page.evaluate(() => window.scrollTo(0, Math.min(600, document.body.scrollHeight / 2))).catch(() => null);
-  await page.waitForTimeout(1500);
-  await page.evaluate(() => window.scrollTo(0, 0)).catch(() => null);
+  // Wheel-scroll to trigger IntersectionObserver and lazy-load images/variants
+  await page.mouse.wheel(0, 800).catch(() => null);
+  await page.waitForTimeout(1000);
+  await page.mouse.wheel(0, 800).catch(() => null);
+  await page.waitForTimeout(1000);
+  await page.mouse.wheel(0, -1600).catch(() => null);
+  await page.waitForTimeout(500);
 
   try {
     const domData = await page.evaluate(() => {
@@ -839,7 +901,6 @@ const extractDomFallback = async (page) => {
         variants: jsonLdVariants,
         images: allImages,
         price: null,
-        _debug: { colorElCount: colorEls.length, sizeElCount: sizeEls.length, imgCount: allImgs.length, cdnImgCount: images.length },
       };
     });
 
@@ -847,8 +908,7 @@ const extractDomFallback = async (page) => {
       return null;
     }
 
-    const { _debug, ...rest } = domData;
-    return { ...rest, sourceStage: "dom-live" };
+    return { ...domData, sourceStage: "dom-live" };
   } catch {
     return null;
   }
@@ -1170,7 +1230,7 @@ const classifyAttemptError = (error) => {
     return {
       message: error.message,
       code: error.name,
-      retryable: true,
+      retryable: !error.details?.soldOut,
     };
   }
 
@@ -1241,15 +1301,39 @@ export const fetchProductDetails = async (productUrl, options = {}) => {
               );
             }
 
+            // Detect sold-out: goods_detail returns "sold_out_similar" scene.
+            // With an active session this can be a false positive (bot block) — clear session and retry.
+            // Without a session it's genuinely sold out.
+            const isSoldOut = bucket.goodsDetail.some((entry) => {
+              const str = JSON.stringify(entry.payload);
+              return str.includes("sold_out_similar") || str.includes("sold_out_rec");
+            });
+            if (isSoldOut) {
+              const hasSession = !!attempt.profileKey;
+              if (hasSession) {
+                await clearSessionProfile(attempt.profileKey);
+                throw new UpstreamBlockError(
+                  "Temu returned sold-out page — possible bot block. Session cleared, retrying without session.",
+                  { sessionCleared: true }
+                );
+              }
+              throw new UpstreamBlockError(
+                "Product is sold out — Temu returned similar items instead of product detail.",
+                { soldOut: true }
+              );
+            }
+
             const networkData = extractApiData(bucket, productContext);
             const ssrFallback = await extractSsrFallback(page, productContext);
             const structuredFallback = extractStructuredFallback(snapshot.html);
+            const directApi = await extractDirectApiFetch(page, productContext);
             const domFallback = await extractDomFallback(page);
 
             const mergedData = mergeProductData(productContext, [
               networkData,
               ssrFallback,
               structuredFallback,
+              directApi,
               domFallback,
             ]);
 

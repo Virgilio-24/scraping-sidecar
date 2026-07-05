@@ -43,6 +43,17 @@ const getStorageStatePath = async (profileKey) => {
   return path.join(directoryPath, `${sanitizeSegment(profileKey)}.json`);
 };
 
+export const clearSessionProfile = async (profileKey) => {
+  if (!profileKey) return;
+  try {
+    const p = await getStorageStatePath(profileKey);
+    await fs.unlink(p);
+    console.log(`[browser] Cleared session profile: ${profileKey}`);
+  } catch {
+    // file may not exist — ignore
+  }
+};
+
 const resolveStorageStateOption = async (storageStatePath) => {
   try {
     await fs.access(storageStatePath);
