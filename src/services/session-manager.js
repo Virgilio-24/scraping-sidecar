@@ -96,7 +96,11 @@ export const captureSessionForProduct = async (siteKey, productUrl, { timeoutMs 
 
   const browser = await chromium.launch({
     headless: false,
-    args: ["--disable-blink-features=AutomationControlled"],
+    args: [
+      "--disable-blink-features=AutomationControlled",
+      "--start-maximized",
+      "--no-default-browser-check",
+    ],
     channel: config.browserChannel || undefined,
   });
 
@@ -104,7 +108,7 @@ export const captureSessionForProduct = async (siteKey, productUrl, { timeoutMs 
     const context = await browser.newContext({
       locale: site.locale,
       userAgent: config.userAgent,
-      viewport: { width: 1920, height: 1080 },
+      viewport: null,
       screen: { width: 1920, height: 1080 },
       colorScheme: "light",
       timezoneId: "Europe/Lisbon",
@@ -190,7 +194,7 @@ export const captureSession = async (siteKey) => {
     const context = await browser.newContext({
       locale: site.locale,
       userAgent: config.userAgent,
-      viewport: { width: 1920, height: 1080 },
+      viewport: null,
       screen: { width: 1920, height: 1080 },
       colorScheme: "light",
       timezoneId: "Europe/Lisbon",
