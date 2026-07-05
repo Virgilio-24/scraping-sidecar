@@ -6,6 +6,21 @@ import { config, resolveProjectPath } from "../config.js";
 
 chromium.use(StealthPlugin());
 
+// Active VNC browser sessions waiting to be saved manually
+const activeSessions = new Map(); // siteKey → { context, page, resolve, reject }
+
+export const saveActiveSession = async (siteKey) => {
+  const session = activeSessions.get(siteKey);
+  if (!session) throw new Error(`Nenhuma sessão VNC activa para "${siteKey}".`);
+  session.resolve();
+};
+
+export const cancelActiveSession = async (siteKey) => {
+  const session = activeSessions.get(siteKey);
+  if (!session) throw new Error(`Nenhuma sessão VNC activa para "${siteKey}".`);
+  session.reject(new Error("Sessão cancelada pelo utilizador."));
+};
+
 // All supported sites with their profile keys and start URLs
 export const SITE_CONFIGS = {
   "shein-pt":      { profileKey: "pt-direct-seeded",        startUrl: "https://pt.shein.com/",           name: "SHEIN Portugal",    locale: "pt-PT" },
@@ -122,35 +137,24 @@ export const captureSessionForProduct = async (siteKey, productUrl, { timeoutMs 
     await dismissOverlays(page);
 
     console.log(`[session] VNC browser aberto → ${productUrl}`);
-    console.log(`[session] Aguarda carregamento do produto no VNC (max ${timeoutMs / 1000}s)...`);
-    console.log(`[session] Se aparecer login ou CAPTCHA, resolve manualmente no VNC: http://servidor:6080/vnc.html`);
+    console.log(`[session] Faz login/resolve CAPTCHA no noVNC e depois chama POST /api/session/save-vnc com { "site": "${siteKey}" }`);
 
-    // Wait until the page has meaningful product content (h1 present + not a bot/login page)
-    const productLoaded = await page.waitForFunction(
-      () => {
-        const h1 = document.querySelector("h1");
-        const bodyText = document.body?.innerText || "";
-        const url = window.location.href;
-        const hasCaptcha = /slide|verify|captcha|security check/i.test(bodyText);
-        const isLoginPage = /login|signin|sign-in|passport|account\/login/i.test(url);
-        const hasLoginForm = !!document.querySelector('input[type="password"]');
-        return h1 && h1.textContent.trim().length > 5 && !hasCaptcha && !isLoginPage && !hasLoginForm;
-      },
-      { timeout: timeoutMs, polling: 2000 }
-    ).then(() => true).catch(() => false);
+    // Wait for manual save signal or timeout
+    await new Promise((resolve, reject) => {
+      activeSessions.set(siteKey, { context, page, resolve, reject });
+      setTimeout(() => reject(new Error(`Timeout após ${timeoutMs / 1000}s. Cookies NOT saved.`)), timeoutMs);
+    }).finally(() => {
+      activeSessions.delete(siteKey);
+    });
 
-    if (!productLoaded) {
-      throw new Error("Timeout: product page did not load within the allowed time. Cookies NOT saved.");
-    }
-
-    // Product loaded successfully — save session
+    // Save session after manual signal
     await context.storageState({ path: profilePath });
     await context.close();
 
     const saved = JSON.parse(await fs.readFile(profilePath, "utf8"));
     const cookieCount = (saved.cookies || []).length;
 
-    console.log(`[session] ✅ Produto carregado — sessão guardada (${cookieCount} cookies)`);
+    console.log(`[session] ✅ Sessão guardada manualmente (${cookieCount} cookies)`);
 
     return {
       site: siteKey,
@@ -161,6 +165,7 @@ export const captureSessionForProduct = async (siteKey, productUrl, { timeoutMs 
       savedAt: new Date().toISOString(),
     };
   } finally {
+    activeSessions.delete(siteKey);
     await browser.close();
   }
 };

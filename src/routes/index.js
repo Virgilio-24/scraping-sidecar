@@ -21,6 +21,8 @@ import {
   getSessionStatus,
   deleteSession,
   postSessionCaptureForProduct,
+  postSaveVncSession,
+  postCancelVncSession,
 } from "../controllers/product.js";
 
 const router = express.Router();
@@ -50,7 +52,9 @@ router.post("/session/capture", postSessionCapture);
 router.get("/session/status", getSessionStatus);
 router.delete("/session", deleteSession);
 
-// VNC session capture — opens visible browser on server, waits for product, saves cookies
+// VNC session capture — opens visible browser on server, user interacts, then saves manually
 router.post("/session/capture-vnc", postSessionCaptureForProduct);
+router.post("/session/save-vnc", postSaveVncSession);
+router.post("/session/cancel-vnc", postCancelVncSession);
 
 export default router;

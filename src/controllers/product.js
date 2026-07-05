@@ -8,6 +8,8 @@ import {
 import {
   captureSession,
   captureSessionForProduct,
+  saveActiveSession,
+  cancelActiveSession,
   getAllSessionStatus,
   clearSession,
   SITE_CONFIGS,
@@ -624,4 +626,26 @@ export const postSessionCaptureForProduct = async (req, res) => {
     .catch((err) => {
       console.error(`[session-vnc] ❌ Falha ao capturar sessão para ${site}: ${err.message}`);
     });
+};
+
+export const postSaveVncSession = async (req, res) => {
+  const { site } = req.body || {};
+  if (!site) return res.status(400).json({ status: "error", message: "Parâmetro 'site' obrigatório." });
+  try {
+    await saveActiveSession(site);
+    res.json({ status: "ok", message: `Sessão para "${site}" guardada.` });
+  } catch (err) {
+    res.status(400).json({ status: "error", message: err.message });
+  }
+};
+
+export const postCancelVncSession = async (req, res) => {
+  const { site } = req.body || {};
+  if (!site) return res.status(400).json({ status: "error", message: "Parâmetro 'site' obrigatório." });
+  try {
+    await cancelActiveSession(site);
+    res.json({ status: "ok", message: `Sessão para "${site}" cancelada.` });
+  } catch (err) {
+    res.status(400).json({ status: "error", message: err.message });
+  }
 };
