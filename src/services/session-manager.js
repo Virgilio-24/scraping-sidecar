@@ -158,6 +158,18 @@ export const captureSessionForProduct = async (siteKey, productUrl, { timeoutMs 
     const saved = JSON.parse(await fs.readFile(profilePath, "utf8"));
     const cookieCount = (saved.cookies || []).length;
 
+    // Sincronizar cookies para o Firestore via TradeFlow (para o import worker usar)
+    if (saved.cookies?.length && config.tradeflowApiUrl && config.tradeflowAdminToken) {
+      const domain = new URL(site.startUrl).hostname.replace(/^www\./, '');
+      const cookieString = saved.cookies.map(c => `${c.name}=${c.value}`).join('; ');
+      fetch(`${config.tradeflowApiUrl}/cookies/sync`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': config.tradeflowAdminToken },
+        body: JSON.stringify({ domain, cookies: cookieString }),
+      }).then(() => console.log(`[session] ✅ ${cookieCount} cookies sincronizados para Firestore (${domain})`))
+        .catch(err => console.warn(`[session] ⚠️ Falha ao sincronizar cookies: ${err.message}`));
+    }
+
     console.log(`[session] ✅ Sessão guardada manualmente (${cookieCount} cookies)`);
 
     return {

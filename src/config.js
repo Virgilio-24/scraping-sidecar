@@ -38,6 +38,8 @@ export const config = {
   proxyUrls: parseProxyList(process.env.PROXY_URLS),
   apiKey: process.env.API_KEY || null,
   browserChannel: process.env.BROWSER_CHANNEL || null,
+  tradeflowApiUrl: process.env.TRADEFLOW_API_URL || null,
+  tradeflowAdminToken: process.env.TRADEFLOW_ADMIN_TOKEN || null,
   userAgent:
     process.env.USER_AGENT ||
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
