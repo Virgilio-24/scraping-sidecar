@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY package*.json ./
 RUN npm ci --omit=dev
 
+RUN npx playwright install chrome --with-deps
+
 COPY src/ ./src/
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
