@@ -1246,8 +1246,74 @@ const classifyAttemptError = (error) => {
   };
 };
 
+const TEMU_HEADERS_PATH = () => path.join(resolveProjectPath(config.sessionStateDir), 'temu-api-headers.json');
+
+const loadCapturedHeaders = async () => {
+  try {
+    const raw = await fs.readFile(TEMU_HEADERS_PATH(), 'utf8');
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+};
+
+// Try a direct Node.js fetch to Temu's product API using intercepted browser headers.
+// This bypasses Playwright entirely and replays the real browser's anti-bot tokens.
+const tryDirectApiFetch = async (productContext) => {
+  const { goodsId } = productContext;
+  if (!goodsId) return null;
+
+  const savedHeaders = await loadCapturedHeaders();
+  if (!savedHeaders || !savedHeaders.cookie) return null;
+
+  // Remove headers that would be wrong outside a browser context
+  const { 'content-length': _cl, 'transfer-encoding': _te, host: _host, ...headers } = savedHeaders;
+  // Remove metadata key
+  delete headers.savedAt;
+
+  const endpoints = [
+    { url: 'https://www.temu.com/pt/api/poppy/v1/goods', body: { goods_id: goodsId, scene: 'goods_detail', language: 'pt-PT' } },
+    { url: 'https://www.temu.com/api/poppy/v1/goods',    body: { goods_id: goodsId, scene: 'goods_detail' } },
+  ];
+
+  for (const endpoint of endpoints) {
+    try {
+      const res = await fetch(endpoint.url, {
+        method: 'POST',
+        headers: { ...headers, 'content-type': 'application/json', 'accept': 'application/json' },
+        body: JSON.stringify(endpoint.body),
+        signal: AbortSignal.timeout(15_000),
+      });
+      console.log(`[temu-direct] ${endpoint.url} → ${res.status}`);
+      if (!res.ok) continue;
+      const payload = await res.json();
+      const extracted = extractApiData({ goodsDetail: [{ url: endpoint.url, payload }], seoData: [] }, productContext);
+      if (extracted) {
+        extracted.sourceStage = 'direct-api-replay';
+        return extracted;
+      }
+    } catch (e) {
+      console.log(`[temu-direct] ${endpoint.url} erro: ${e.message}`);
+    }
+  }
+  return null;
+};
+
 export const fetchProductDetails = async (productUrl, options = {}) => {
   const productContext = parseProductUrl(productUrl);
+
+  // Fast path: try direct API fetch with intercepted browser headers (no Playwright needed)
+  const directResult = await tryDirectApiFetch(productContext);
+  if (directResult && hasUsefulProductData({ ...directResult, price: directResult.price ?? {}, images: directResult.images ?? [] })) {
+    console.log(`[temu-direct] ✅ Product fetched via header replay — "${(directResult.title ?? '').slice(0, 60)}"`);
+    return {
+      ...directResult,
+      url: productContext.productUrl,
+      sourceChain: ['direct-api-replay'],
+      antiBot: { attempt: null, round: null, proxy: 'direct-replay', proxyTarget: null, sessionProfile: null, totalAttempts: 1, attemptsTried: 1, attemptHistory: [], proxyMetrics: {} },
+    };
+  }
+
   const attempts = buildAttempts(options.proxyUrls);
   const failureHistory = [];
   const cachedProducts = await readProductCache();

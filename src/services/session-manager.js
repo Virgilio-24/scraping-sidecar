@@ -127,6 +127,22 @@ export const captureSessionForProduct = async (siteKey, productUrl, { timeoutMs 
 
     const page = await context.newPage();
 
+    // For Temu: intercept outgoing API requests to capture anti-bot headers
+    const capturedApiHeaders = {};
+    const TEMU_API_PATTERN = /\/api\/(?:poppy\/v1\/goods|bg\/.*goods.*detail|bg\/.*item.*info|oak\/integration\/render)/i;
+    if (siteKey === 'temu') {
+      page.on('request', (req) => {
+        if (TEMU_API_PATTERN.test(req.url())) {
+          const hdrs = req.headers();
+          // Only save if it has anti-bot signals
+          if (hdrs['x-vk-nap'] || hdrs['sign'] || hdrs['anti-content'] || hdrs['x-sign-type']) {
+            Object.assign(capturedApiHeaders, hdrs);
+            console.log(`[session-temu] Intercepted API headers from ${req.url()} — keys: ${Object.keys(hdrs).join(', ')}`);
+          }
+        }
+      });
+    }
+
     // Navigate to homepage first to trigger cookie consent and establish base session
     console.log(`[session] A navegar para homepage de ${site.name}...`);
     await page.goto(site.startUrl, { waitUntil: "domcontentloaded", timeout: 60_000 });
@@ -157,6 +173,15 @@ export const captureSessionForProduct = async (siteKey, productUrl, { timeoutMs 
 
     const saved = JSON.parse(await fs.readFile(profilePath, "utf8"));
     const cookieCount = (saved.cookies || []).length;
+
+    // Save captured Temu anti-bot headers if intercepted
+    if (siteKey === 'temu' && Object.keys(capturedApiHeaders).length > 0) {
+      const headersPath = path.join(resolveProjectPath(config.sessionStateDir), 'temu-api-headers.json');
+      const cookieString = (saved.cookies || []).map(c => `${c.name}=${c.value}`).join('; ');
+      const toSave = { ...capturedApiHeaders, cookie: cookieString, savedAt: new Date().toISOString() };
+      await fs.writeFile(headersPath, JSON.stringify(toSave, null, 2));
+      console.log(`[session-temu] ✅ Anti-bot headers guardados (${Object.keys(capturedApiHeaders).length} keys)`);
+    }
 
     // Sincronizar cookies para o Firestore via TradeFlow (para o import worker usar)
     if (saved.cookies?.length && config.tradeflowApiUrl && config.tradeflowAdminToken) {
