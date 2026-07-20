@@ -730,11 +730,15 @@ export const fetchProductDetails = async (productUrl, options = {}) => {
 
             let snapshot = await readPageSnapshot(page);
 
+            console.log(`[aliexpress] attempt ${attempt.attemptNumber} — ${productContext.productUrl} — proxy=${attempt.label}`);
+
             if (isLoginWall(snapshot.bodyText, snapshot.pageTitle)) {
+              console.log(`[aliexpress] attempt ${attempt.attemptNumber} — login wall detected (title="${snapshot.pageTitle}")`);
               throw new UpstreamBlockError("AliExpress is showing a login wall.");
             }
 
             if (isHumanCheck(snapshot.bodyText, snapshot.pageTitle)) {
+              console.log(`[aliexpress] attempt ${attempt.attemptNumber} — human check detected (title="${snapshot.pageTitle}")`);
               await waitForHumanVerification(page);
               snapshot = await readPageSnapshot(page);
             }
@@ -750,6 +754,8 @@ export const fetchProductDetails = async (productUrl, options = {}) => {
             const structuredFallback = extractStructuredFallback(snapshot.html);
             const domFallback = await extractDomFallback(page);
 
+            console.log(`[aliexpress] attempt ${attempt.attemptNumber} — sources: network=${!!networkData} runParams=${!!runParamsData} jsonLd=${!!structuredFallback} dom=${!!domFallback}`);
+
             const mergedData = mergeProductData(productContext, [
               networkData,
               runParamsData,
@@ -759,6 +765,7 @@ export const fetchProductDetails = async (productUrl, options = {}) => {
 
             if (hasUsefulProductData(mergedData)) return mergedData;
 
+            console.log(`[aliexpress] attempt ${attempt.attemptNumber} — no useful data (title="${snapshot.pageTitle}")`);
             throw new UpstreamBlockError(
               "AliExpress did not expose enough product data for this request."
             );
