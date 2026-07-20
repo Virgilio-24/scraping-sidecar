@@ -765,7 +765,8 @@ export const fetchProductDetails = async (productUrl, options = {}) => {
 
             if (hasUsefulProductData(mergedData)) return mergedData;
 
-            console.log(`[aliexpress] attempt ${attempt.attemptNumber} — no useful data (title="${snapshot.pageTitle}")`);
+            const bodyPreview = snapshot.bodyText?.replace(/\s+/g, ' ').slice(0, 300) ?? '';
+            console.log(`[aliexpress] attempt ${attempt.attemptNumber} — no useful data (title="${snapshot.pageTitle}") body="${bodyPreview}"`);
             throw new UpstreamBlockError(
               "AliExpress did not expose enough product data for this request."
             );
