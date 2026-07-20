@@ -666,6 +666,12 @@ const navigateToProduct = async (page, productUrl) => {
     if (!msg.includes("ERR_ABORTED") && !msg.includes("interrupted by another navigation")) throw error;
   }
   await page.waitForLoadState("domcontentloaded", { timeout: config.requestTimeoutMs });
+  // Give the SPA time to fire product API calls
+  try {
+    await page.waitForLoadState("networkidle", { timeout: 12000 });
+  } catch {
+    // networkidle timeout is non-fatal — proceed with what we have
+  }
 };
 
 const waitForHumanVerification = async (page) => {
