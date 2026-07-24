@@ -994,6 +994,29 @@ const mergeProductData = (productContext, layers) => {
   return merged;
 };
 
+const extractColorImagesFromWindow = async (page) => {
+  try {
+    return await page.evaluate(() => {
+      if (typeof colorImages === 'undefined' || !colorImages || typeof colorImages !== 'object') return null;
+      const normalize = (url) => {
+        if (!url || typeof url !== 'string') return null;
+        if (url.startsWith('//')) return `https:${url}`;
+        if (url.startsWith('http://')) return `https://${url.slice(7)}`;
+        return url;
+      };
+      const result = {};
+      for (const [key, entries] of Object.entries(colorImages)) {
+        if (key === 'initial' || !Array.isArray(entries) || entries.length === 0) continue;
+        const imgs = [...new Set(entries.map(e => normalize(e.hiRes || e.large)).filter(Boolean))];
+        if (imgs.length > 0) result[key] = imgs;
+      }
+      return Object.keys(result).length > 0 ? result : null;
+    });
+  } catch {
+    return null;
+  }
+};
+
 const prewarmSession = async (page, productContext) => {
   if (config.prewarmHomeMs <= 0) {
     return;
@@ -1079,7 +1102,9 @@ export const fetchProductDetails = async (productUrl, options = {}) => {
           const jsonLdLayer = extractJsonLdLayer(snapshot.html);
           const scriptLayer = extractScriptLayer(snapshot.html, productContext.asin);
           const domLayer = await extractDomFallback(page);
+          const colorImagesMap = await extractColorImagesFromWindow(page);
           const mergedData = mergeProductData(productContext, [jsonLdLayer, scriptLayer, domLayer]);
+          if (colorImagesMap) mergedData.colorImagesMap = colorImagesMap;
 
           // Price missing — product requires variant selection (common for clothing/footwear)
           if (!mergedData.price.amount && mergedData.sizes.length > 0) {
