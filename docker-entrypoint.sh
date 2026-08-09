@@ -6,6 +6,11 @@ SCREEN="${SCREEN_RESOLUTION:-1920x1080x24}"
 VNC_PORT="${VNC_PORT:-5900}"
 NOVNC_PORT="${NOVNC_PORT:-6080}"
 
+export DISPLAY
+
+# Remove stale lock file from a previous crash
+rm -f "/tmp/.X${DISPLAY#:}-lock" /tmp/.X11-unix/X"${DISPLAY#:}" 2>/dev/null || true
+
 echo "[entrypoint] Starting Xvfb on display $DISPLAY ($SCREEN)..."
 Xvfb "$DISPLAY" -screen 0 "$SCREEN" -ac +extension GLX +render -noreset &
 XVFB_PID=$!
